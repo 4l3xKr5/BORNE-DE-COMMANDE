@@ -20,7 +20,9 @@ La borne ne doit pas proposer de consommation sur place.
 La borne ne doit pas proposer de livraison.  
 Le parcours doit être exclusivement orienté **commande à emporter + ticket + paiement au comptoir**.
 
-Source principale à respecter : le site de référence Pizza de Nuit.
+Source de référence pour l’identité visuelle et les informations publiques : le site Pizza de Nuit.
+
+Le site ne doit jamais écraser les règles métier confirmées, le fonctionnement à emporter, l’absence de paiement sur borne, l’impression du ticket, le paiement au comptoir ou les consignes présentes dans les documents du projet.
 
 ---
 

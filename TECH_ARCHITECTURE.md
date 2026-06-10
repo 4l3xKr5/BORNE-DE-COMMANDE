@@ -30,18 +30,33 @@ Il définit la structure technique à respecter pour construire progressivement 
 
 Codex doit respecter les documents suivants dans cet ordre :
 
-1. PROJECT_CONTEXT.md
-2. AGENT.md
-3. CAHIER_DES_CHARGES.md
-4. USER_FLOW.md
-5. ORDER_RULES.md
-6. DESIGN_GUIDELINES.md
-7. Site officiel Pizza de Nuit : https://pizza-de-nuit.vercel.app/
-8. Code existant du projet
+1. Dernière demande explicite de l’utilisateur
+2. `PROJECT_CONTEXT.md`
+3. `AGENT.md`
+4. `CAHIER_DES_CHARGES.md`
+5. `USER_FLOW.md`
+6. `ORDER_RULES.md`
+7. `DESIGN_GUIDELINES.md`
+8. `TECH_ARCHITECTURE.md`
+9. `DATABASE_SCHEMA.md`
+10. Site Pizza de Nuit pour l’identité visuelle et les informations publiques
+11. Code existant
+12. Bonnes pratiques techniques
 
 En cas de contradiction, Codex doit suivre l’ordre de priorité ci-dessus.
 
 Codex ne doit pas inventer une règle, un produit, un prix, une offre, une fonctionnalité ou une donnée absente des documents de référence.
+
+Le site Pizza de Nuit sert à comprendre l’identité visuelle, l’univers, le ton, l’ambiance et les informations publiques visibles.
+
+Il ne doit jamais écraser :
+
+- les règles métier confirmées ;
+- le fonctionnement à emporter ;
+- l’absence de paiement sur borne ;
+- l’impression du ticket ;
+- le paiement au comptoir ;
+- les consignes présentes dans les documents du projet.
 
 Si une information manque, Codex doit l’indiquer clairement :
 
@@ -1911,6 +1926,8 @@ Options possibles :
 2. stockage serveur simple ;
 3. SQLite local si le projet tourne localement ;
 4. base plus avancée uniquement si demandée plus tard.
+
+`DATABASE_SCHEMA.md` décrit une cible complète et évolutive. Il ne doit pas être interprété comme une obligation d’implémenter toutes les tables dès la V1.
 
 ---
 

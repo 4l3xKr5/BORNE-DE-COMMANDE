@@ -33,13 +33,18 @@ Il complète ces documents en définissant uniquement les règles visuelles, UI,
 
 Codex doit respecter les sources suivantes avant toute création ou modification visuelle :
 
-1. `PROJECT_CONTEXT.md`
-2. `AGENT.md`
-3. `CAHIER_DES_CHARGES.md`
-4. `USER_FLOW.md`
-5. `ORDER_RULES.md`
-6. Site officiel Pizza de Nuit : `https://pizza-de-nuit.vercel.app/`
-7. Fichiers existants du projet si l’application est déjà commencée
+1. Dernière demande explicite de l’utilisateur
+2. `PROJECT_CONTEXT.md`
+3. `AGENT.md`
+4. `CAHIER_DES_CHARGES.md`
+5. `USER_FLOW.md`
+6. `ORDER_RULES.md`
+7. `DESIGN_GUIDELINES.md`
+8. `TECH_ARCHITECTURE.md`
+9. `DATABASE_SCHEMA.md`
+10. Site Pizza de Nuit pour l’identité visuelle et les informations publiques
+11. Code existant
+12. Bonnes pratiques techniques
 
 Le site officiel Pizza de Nuit doit être utilisé pour comprendre :
 
@@ -53,6 +58,15 @@ Le site officiel Pizza de Nuit doit être utilisé pour comprendre :
 - la présentation des pizzas ;
 - le ton visuel global ;
 - l’identité de marque.
+
+Le site Pizza de Nuit ne doit jamais écraser :
+
+- les règles métier confirmées ;
+- le fonctionnement à emporter ;
+- l’absence de paiement sur borne ;
+- l’impression du ticket ;
+- le paiement au comptoir ;
+- les consignes présentes dans les documents du projet.
 
 La borne ne doit pas inventer une nouvelle identité.
 

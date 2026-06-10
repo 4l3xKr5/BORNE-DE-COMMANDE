@@ -43,16 +43,33 @@ Il se concentre uniquement sur les règles métier liées à la commande.
 
 Codex doit respecter les sources suivantes, dans cet ordre de priorité :
 
-1. `PROJECT_CONTEXT.md`
-2. `AGENT.md`
-3. `CAHIER_DES_CHARGES.md`
-4. `USER_FLOW.md`
-5. site officiel Pizza de Nuit : `https://pizza-de-nuit.vercel.app/`
-6. bonnes pratiques métier de borne de commande
+1. Dernière demande explicite de l’utilisateur
+2. `PROJECT_CONTEXT.md`
+3. `AGENT.md`
+4. `CAHIER_DES_CHARGES.md`
+5. `USER_FLOW.md`
+6. `ORDER_RULES.md`
+7. `DESIGN_GUIDELINES.md`
+8. `TECH_ARCHITECTURE.md`
+9. `DATABASE_SCHEMA.md`
+10. Site Pizza de Nuit pour l’identité visuelle et les informations publiques
+11. Code existant
+12. Bonnes pratiques techniques
 
 En cas de contradiction, Codex doit appliquer l’ordre de priorité ci-dessus.
 
 Codex ne doit jamais inventer une règle métier si l’information est absente des documents ou du site officiel.
+
+Le site Pizza de Nuit sert à comprendre l’identité visuelle, l’univers, le ton, l’ambiance et les informations publiques visibles.
+
+Il ne doit jamais écraser :
+
+- les règles métier confirmées ;
+- le fonctionnement à emporter ;
+- l’absence de paiement sur borne ;
+- l’impression du ticket ;
+- le paiement au comptoir ;
+- les consignes présentes dans les documents du projet.
 
 Si une donnée manque, Codex doit indiquer clairement :
 

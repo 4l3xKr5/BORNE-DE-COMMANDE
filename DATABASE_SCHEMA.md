@@ -39,14 +39,18 @@ La base de données doit rester simple, claire, maintenable et adaptée au fonct
 
 Codex doit respecter les sources suivantes, dans cet ordre :
 
-1. `PROJECT_CONTEXT.md`
-2. `AGENT.md`
-3. `CAHIER_DES_CHARGES.md`
-4. `USER_FLOW.md`
-5. `ORDER_RULES.md`
-6. `DESIGN_GUIDELINES.md`
-7. `TECH_ARCHITECTURE.md`
-8. Site officiel Pizza de Nuit : `https://pizza-de-nuit.vercel.app/`
+1. Dernière demande explicite de l’utilisateur
+2. `PROJECT_CONTEXT.md`
+3. `AGENT.md`
+4. `CAHIER_DES_CHARGES.md`
+5. `USER_FLOW.md`
+6. `ORDER_RULES.md`
+7. `DESIGN_GUIDELINES.md`
+8. `TECH_ARCHITECTURE.md`
+9. `DATABASE_SCHEMA.md`
+10. Site Pizza de Nuit pour l’identité visuelle et les informations publiques
+11. Code existant
+12. Bonnes pratiques techniques
 
 Le site officiel Pizza de Nuit doit être utilisé pour comprendre :
 
@@ -57,6 +61,15 @@ Le site officiel Pizza de Nuit doit être utilisé pour comprendre :
 - les éléments visibles de menu ;
 - la façon de présenter l’offre ;
 - l’essence générale de la marque.
+
+Le site Pizza de Nuit ne doit jamais écraser :
+
+- les règles métier confirmées ;
+- le fonctionnement à emporter ;
+- l’absence de paiement sur borne ;
+- l’impression du ticket ;
+- le paiement au comptoir ;
+- les consignes présentes dans les documents du projet.
 
 Si une donnée métier n’est pas présente dans les documents ou sur le site officiel, Codex doit écrire exactement :
 
@@ -129,13 +142,32 @@ Elle ne doit stocker aucune donnée bancaire.
 
 Le projet doit rester simple au démarrage.
 
+`DATABASE_SCHEMA.md` décrit une cible complète et évolutive.
+
+Il ne doit pas être interprété comme une obligation d’implémenter toutes les tables dès la V1.
+
+Pour la V1, ne pas implémenter tout le schéma `DATABASE_SCHEMA.md`.
+
+La V1 doit commencer simplement avec :
+
+- des fichiers typés dans `/src/data` ;
+- des types centralisés dans `/src/types` ;
+- une logique métier claire ;
+- des données structurées et remplaçables ;
+- aucune base de données lourde au départ ;
+- aucune implémentation complète de toutes les tables ;
+- aucune migration complète ;
+- aucune surarchitecture.
+
+La persistance des commandes ne doit être ajoutée que si nécessaire.
+
 La stratégie recommandée est progressive :
 
 1. commencer avec des fichiers typés dans `/src/data` ;
 2. centraliser les types dans `/src/types` ;
-3. isoler l’accès aux données dans des repositories ;
-4. migrer vers SQLite local si la persistance devient nécessaire ;
-5. conserver une architecture compatible avec un backend minimal Next.js.
+3. isoler l’accès aux données dans des services ou repositories simples ;
+4. ajouter une persistance locale uniquement si nécessaire ;
+5. envisager SQLite plus tard si le besoin est confirmé.
 
 Cette approche permet de démarrer vite sans enfermer le projet dans une stack lourde.
 

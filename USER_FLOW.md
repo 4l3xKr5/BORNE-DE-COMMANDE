@@ -28,10 +28,18 @@ Il se concentre uniquement sur le parcours utilisateur côté borne.
 
 Les sources de vérité du parcours sont :
 
-1. `PROJECT_CONTEXT.md`
-2. `AGENT.md`
-3. `CAHIER_DES_CHARGES.md`
-4. site officiel Pizza de Nuit : `https://pizza-de-nuit.vercel.app/`
+1. Dernière demande explicite de l’utilisateur
+2. `PROJECT_CONTEXT.md`
+3. `AGENT.md`
+4. `CAHIER_DES_CHARGES.md`
+5. `USER_FLOW.md`
+6. `ORDER_RULES.md`
+7. `DESIGN_GUIDELINES.md`
+8. `TECH_ARCHITECTURE.md`
+9. `DATABASE_SCHEMA.md`
+10. Site Pizza de Nuit pour l’identité visuelle et les informations publiques
+11. Code existant
+12. Bonnes pratiques techniques
 
 Le site Pizza de Nuit doit être utilisé pour comprendre :
 
@@ -42,6 +50,15 @@ Le site Pizza de Nuit doit être utilisé pour comprendre :
 - l’alternance entre zones sombres et zones claires ;
 - le ton direct ;
 - la manière de présenter les pizzas.
+
+Le site Pizza de Nuit ne doit jamais écraser :
+
+- les règles métier confirmées ;
+- le fonctionnement à emporter ;
+- l’absence de paiement sur borne ;
+- l’impression du ticket ;
+- le paiement au comptoir ;
+- les consignes présentes dans les documents du projet.
 
 La borne ne doit pas inventer une nouvelle identité.
 

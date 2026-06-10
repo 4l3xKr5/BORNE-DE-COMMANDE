@@ -26,22 +26,20 @@ Codex doit construire une borne adaptée à Pizza de Nuit.
 
 Avant toute modification, Codex doit respecter en priorité :
 
-1. `PROJECT_CONTEXT.md`
-2. `AGENT.md`
-3. le site officiel Pizza de Nuit : https://pizza-de-nuit.vercel.app/
-4. les documents UX du projet ;
-5. les documents design du projet ;
-6. les documents techniques du projet ;
-7. les fichiers existants du code.
+1. Dernière demande explicite de l’utilisateur
+2. `PROJECT_CONTEXT.md`
+3. `AGENT.md`
+4. `CAHIER_DES_CHARGES.md`
+5. `USER_FLOW.md`
+6. `ORDER_RULES.md`
+7. `DESIGN_GUIDELINES.md`
+8. `TECH_ARCHITECTURE.md`
+9. `DATABASE_SCHEMA.md`
+10. Site Pizza de Nuit pour l’identité visuelle et les informations publiques
+11. Code existant
+12. Bonnes pratiques techniques
 
-En cas de contradiction, Codex doit suivre cet ordre :
-
-1. `PROJECT_CONTEXT.md`
-2. `AGENT.md`
-3. demande explicite de l’utilisateur ;
-4. site officiel Pizza de Nuit ;
-5. code existant ;
-6. bonnes pratiques techniques.
+En cas de contradiction, Codex doit suivre cet ordre.
 
 Codex doit signaler toute contradiction au lieu d’inventer une solution.
 
@@ -66,7 +64,18 @@ Ce site doit être utilisé pour comprendre ou vérifier :
 - les références visuelles ;
 - les informations publiques disponibles.
 
-Le site doit être considéré comme la source principale pour comprendre l’essence de Pizza de Nuit.
+Le site doit être considéré comme la source de référence principale pour comprendre l’essence de Pizza de Nuit.
+
+Le site Pizza de Nuit sert à comprendre l’identité visuelle, l’univers, le ton, l’ambiance et les informations publiques visibles.
+
+Il ne doit jamais écraser :
+
+- les règles métier confirmées ;
+- le fonctionnement à emporter ;
+- l’absence de paiement sur borne ;
+- l’impression du ticket ;
+- le paiement au comptoir ;
+- les consignes présentes dans les documents du projet.
 
 Codex doit s’en servir pour rester fidèle à :
 

@@ -27,31 +27,33 @@ La roadmap doit permettre de construire progressivement :
 
 Avant toute phase de développement, Codex doit lire et respecter les documents suivants :
 
-1. `PROJECT_CONTEXT.md`
-2. `AGENT.md`
-3. `CAHIER_DES_CHARGES.md`
-4. `USER_FLOW.md`
-5. `ORDER_RULES.md`
-6. `DESIGN_GUIDELINES.md`
-7. `TECH_ARCHITECTURE.md`
-8. `DATABASE_SCHEMA.md`
-9. Site officiel Pizza de Nuit : `https://pizza-de-nuit.vercel.app/`
+1. Dernière demande explicite de l’utilisateur
+2. `PROJECT_CONTEXT.md`
+3. `AGENT.md`
+4. `CAHIER_DES_CHARGES.md`
+5. `USER_FLOW.md`
+6. `ORDER_RULES.md`
+7. `DESIGN_GUIDELINES.md`
+8. `TECH_ARCHITECTURE.md`
+9. `DATABASE_SCHEMA.md`
+10. Site Pizza de Nuit pour l’identité visuelle et les informations publiques
+11. Code existant
+12. Bonnes pratiques techniques
 
 Le site officiel indique l’univers général de Pizza de Nuit : **La Street Pizza de la Nuit**, avec une identité nocturne, urbaine, directe et commerciale.
 
-En cas de contradiction, appliquer l’ordre de priorité suivant :
+Le site Pizza de Nuit sert à comprendre l’identité visuelle, l’univers, le ton, l’ambiance et les informations publiques visibles.
 
-1. demande explicite de l’utilisateur ;
-2. `PROJECT_CONTEXT.md` ;
-3. `AGENT.md` ;
-4. `CAHIER_DES_CHARGES.md` ;
-5. `USER_FLOW.md` ;
-6. `ORDER_RULES.md` ;
-7. `DESIGN_GUIDELINES.md` ;
-8. `TECH_ARCHITECTURE.md` ;
-9. `DATABASE_SCHEMA.md` ;
-10. site officiel Pizza de Nuit ;
-11. bonnes pratiques techniques.
+Il ne doit jamais écraser :
+
+- les règles métier confirmées ;
+- le fonctionnement à emporter ;
+- l’absence de paiement sur borne ;
+- l’impression du ticket ;
+- le paiement au comptoir ;
+- les consignes présentes dans les documents du projet.
+
+En cas de contradiction, appliquer l’ordre de priorité ci-dessus.
 
 ---
 
