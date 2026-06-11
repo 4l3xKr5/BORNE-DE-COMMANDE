@@ -206,7 +206,7 @@ export function KioskApp() {
         {order ? <TicketPrintable order={order} /> : null}
 
         {showFooter ? (
-          <footer className="no-print fixed inset-x-0 bottom-0 mx-auto w-full max-w-[760px] border-t-2 border-[var(--night-950)] bg-white p-4 shadow-2xl">
+          <footer className="kiosk-footer no-print fixed inset-x-0 bottom-0 mx-auto border-t-2 border-[var(--night-950)] bg-white p-4 shadow-2xl">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-bold uppercase text-[var(--neutral-500)]">Total panier</p>

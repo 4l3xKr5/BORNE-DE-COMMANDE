@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --kiosk-max-width: 1080px;
   --night-950: #0b0b0d;
   --night-900: #111114;
   --night-800: #1a1a1f;
@@ -52,11 +53,15 @@ button {
 }
 
 .kiosk-frame {
-  width: min(100vw, 760px);
+  width: min(100vw, var(--kiosk-max-width));
   min-height: 100dvh;
   margin: 0 auto;
   background: var(--paper-50);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 32px 90px rgba(0, 0, 0, 0.5);
+}
+
+.kiosk-footer {
+  width: min(100vw, var(--kiosk-max-width));
 }
 
 .scrollbar-soft::-webkit-scrollbar {
