@@ -35,7 +35,8 @@ export function KioskApp() {
   const totals = useMemo(() => calculateCartTotals(cartItems), [cartItems]);
   const categoryProducts = products.filter((product) => product.categoryId === selectedCategory?.id);
   const isBuilderScreen = screen === "halfHalfBuilder" || screen === "customPizzaBuilder";
-  const showFooter = !isBuilderScreen && screen !== "confirmation";
+  const showFooter = screen !== "home" && !isBuilderScreen && screen !== "confirmation";
+  const showHeaderCart = screen !== "home" && screen !== "confirmation";
 
   useEffect(() => {
     const markActivity = () => setLastActivity(Date.now());
@@ -141,14 +142,18 @@ export function KioskApp() {
             {screen === "home" ? "Accueil" : "Retour"}
           </button>
           <img src="/image/LOGO PIZZA DE NUIT_.webp" alt="Pizza de Nuit" className="h-14 w-28 object-contain" />
-          <button className="relative rounded-full bg-white/10 p-3" onClick={() => setScreen("cart")} aria-label="Panier">
-            <ShoppingCart size={24} />
-            {cartItems.length > 0 ? (
-              <span className="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-[var(--gold-500)] text-xs font-black text-black">
-                {cartItems.length}
-              </span>
-            ) : null}
-          </button>
+          {showHeaderCart ? (
+            <button className="relative rounded-full bg-white/10 p-3" onClick={() => setScreen("cart")} aria-label="Panier">
+              <ShoppingCart size={24} />
+              {cartItems.length > 0 ? (
+                <span className="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-[var(--gold-500)] text-xs font-black text-black">
+                  {cartItems.length}
+                </span>
+              ) : null}
+            </button>
+          ) : (
+            <span aria-hidden="true" className="h-12 w-12" />
+          )}
         </header>
 
         <section className={`no-print flex-1 overflow-y-auto scrollbar-soft ${showFooter ? "pb-36" : "pb-0"}`}>
