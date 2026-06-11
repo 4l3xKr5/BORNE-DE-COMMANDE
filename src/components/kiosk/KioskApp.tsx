@@ -156,7 +156,7 @@ export function KioskApp() {
           )}
         </header>
 
-        <section className={`no-print flex-1 overflow-y-auto scrollbar-soft ${showFooter ? "pb-36" : "pb-0"}`}>
+        <section className={`no-print min-h-0 flex-1 overflow-y-auto scrollbar-soft ${showFooter ? "pb-36" : "pb-0"}`}>
           {settings.maintenanceMode ? <Maintenance /> : null}
           {!settings.maintenanceMode && screen === "home" ? <HomeScreen onStart={() => setScreen("categories")} /> : null}
           {!settings.maintenanceMode && screen === "categories" ? (
@@ -254,8 +254,8 @@ function Maintenance() {
 
 function HomeScreen({ onStart }: { onStart: () => void }) {
   return (
-    <div className="min-h-[calc(100dvh-96px)] bg-[var(--night-950)] text-white">
-      <div className="relative flex min-h-[calc(100dvh-96px)] flex-col justify-between overflow-hidden p-8">
+    <div className="h-full min-h-full bg-[var(--night-950)] text-white">
+      <div className="relative flex h-full min-h-full flex-col justify-between overflow-hidden p-8">
         <img src="/image/photo section hero.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/35 to-black/90" />
         <div className="relative pt-8">
