@@ -16,12 +16,10 @@ export function TicketPrintable({ order }: { order: Order }) {
         {order.items.map((item) => (
           <div key={item.id} className="mb-4 last:mb-0">
             <div className="flex justify-between gap-3 text-sm font-bold">
-              <span>
-                {item.quantity} x {item.productName.toUpperCase()}
-              </span>
+              <span>{item.quantity} x {item.productName.toUpperCase()}</span>
               <span>{formatPrice(item.lineTotal)}</span>
             </div>
-            {(item.formatLabel || item.baseLabel) ? (
+            {item.formatLabel || item.baseLabel ? (
               <p className="mt-1 text-xs font-bold">
                 {item.formatLabel ? `Format : ${item.formatLabel}` : ""}
                 {item.formatLabel && item.baseLabel ? " | " : ""}
@@ -30,15 +28,34 @@ export function TicketPrintable({ order }: { order: Order }) {
             ) : null}
             {item.halfHalf ? (
               <div className="mt-1 border-l-2 border-black pl-2 text-xs">
-                <p><strong>Moit'-Moit'</strong></p>
+                <p>
+                  <strong>Moit-Moit</strong>
+                </p>
                 <p>A : {item.halfHalf.leftPizzaName}</p>
                 <p>B : {item.halfHalf.rightPizzaName}</p>
               </div>
             ) : null}
             {item.customPizza ? (
               <div className="mt-1 border-l-2 border-black pl-2 text-xs">
-                <p><strong>Pizza personnalisée</strong></p>
+                <p>
+                  <strong>Pizza personnalisée</strong>
+                </p>
                 <p>Ingrédients : {item.customPizza.ingredients.map((ingredient) => ingredient.name).join(", ")}</p>
+              </div>
+            ) : null}
+            {item.ingredientExtras && item.ingredientExtras.items.length > 0 ? (
+              <div className="mt-1 border-l-2 border-black pl-2 text-xs">
+                <p>
+                  <strong>Suppléments ingrédients</strong> : {item.ingredientExtras.freeCount}/{item.ingredientExtras.freeAllowance} offerts,{" "}
+                  {item.ingredientExtras.paidCount} payant{item.ingredientExtras.paidCount > 1 ? "s" : ""}, sauces gratuites
+                </p>
+                <p>
+                  {item.ingredientExtras.items
+                    .map((ingredient) =>
+                      `${ingredient.name}${ingredient.isSauce ? " (sauce)" : ingredient.isFree ? " (offert)" : ` (+${formatPrice(ingredient.unitPrice)})`}`
+                    )
+                    .join(", ")}
+                </p>
               </div>
             ) : null}
             {item.supplements.length > 0 ? (

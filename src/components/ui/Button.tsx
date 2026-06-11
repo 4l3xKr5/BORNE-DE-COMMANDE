@@ -9,9 +9,9 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-[var(--gold-500)] text-[var(--night-950)] border-[var(--night-950)] shadow-[0_6px_0_var(--night-950)]",
-  secondary: "bg-white text-[var(--night-950)] border-[var(--night-950)] shadow-[0_4px_0_var(--night-950)]",
-  danger: "bg-[var(--red-500)] text-white border-[var(--night-950)] shadow-[0_4px_0_var(--night-950)]",
+  primary: "bg-[var(--gold-500)] text-[var(--night-950)] border-[var(--night-950)] pdn-card-shadow",
+  secondary: "bg-white text-[var(--night-950)] border-[var(--night-950)] pdn-card-shadow-sm",
+  danger: "bg-[var(--red-500)] text-white border-[var(--night-950)] pdn-card-shadow-sm",
   ghost: "bg-transparent text-[var(--night-950)] border-transparent"
 };
 
@@ -19,7 +19,7 @@ export function Button({ className, variant = "primary", children, ...props }: B
   return (
     <button
       className={cn(
-        "pdn-label min-h-14 rounded-xl border-2 px-5 py-3 text-xl transition active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-45",
+        "pdn-label pdn-pressable min-h-14 rounded-xl border-2 px-5 py-3 text-xl disabled:cursor-not-allowed disabled:opacity-45",
         variants[variant],
         className
       )}

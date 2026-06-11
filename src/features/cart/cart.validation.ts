@@ -24,9 +24,13 @@ export function validateCart(items: CartItem[], products: Product[]) {
       errors.push("Choisissez les deux moitiés de votre pizza.");
     }
 
+    if (item.productType === "halfHalf" && item.formatId && !["1-2m", "60cm"].includes(item.formatId)) {
+      errors.push("Le Moit-Moit est disponible uniquement en 1/2 mètre et 60 cm.");
+    }
+
     if (item.productType === "halfHalf" && item.halfHalf) {
       if (item.halfHalf.leftPizzaId === item.halfHalf.rightPizzaId) {
-        errors.push("Choisissez deux pizzas différentes pour le Moit'-Moit'.");
+        errors.push("Choisissez deux pizzas différentes pour le Moit-Moit.");
       }
 
       const leftPizza = products.find((candidate) => candidate.id === item.halfHalf?.leftPizzaId);

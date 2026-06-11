@@ -83,6 +83,7 @@
   --night-800: #1a1a1f;
   --paper-50: #fffdf7;
   --paper-100: #f7f3ea;
+  --paper-200: #e7dec9;
   --gold-400: #ffd24a;
   --gold-500: #f4c400;
   --gold-600: #e0a900;
@@ -100,9 +101,20 @@
 
 html,
 body {
-  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
   background: var(--night-950);
   color: var(--night-950);
+}
+
+/* Hide all scrollbars universally */
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
 }
 
 body {
@@ -154,8 +166,122 @@ button {
   text-shadow: 3px 3px 0 var(--night-950);
 }
 
+.pdn-text-shadow {
+  text-shadow: 4px 3px 0 var(--night-950);
+}
+
+.pdn-product-drop-shadow {
+  filter: 
+    drop-shadow(2px 5px 4px rgba(5, 5, 5, 0.38)) 
+    drop-shadow(6px 12px 14px rgba(5, 5, 5, 0.22));
+}
+
+.pdn-contact-shadow-dense {
+  filter: 
+    drop-shadow(0 2px 1px rgba(0, 0, 0, 0.95)) 
+    drop-shadow(0 4px 3px rgba(0, 0, 0, 0.7));
+}
+
+@keyframes pizza-float-shadow {
+  0%, 100% {
+    transform: translateY(0);
+    filter: 
+      drop-shadow(0 8px 5px rgba(5, 5, 5, 0.44)) 
+      drop-shadow(0 16px 14px rgba(5, 5, 5, 0.26));
+  }
+  50% {
+    transform: translateY(-16px);
+    filter: 
+      drop-shadow(0 12px 10px rgba(5, 5, 5, 0.28)) 
+      drop-shadow(0 32px 22px rgba(5, 5, 5, 0.16));
+  }
+}
+
+.animate-pizza-float-shadow {
+  animation: pizza-float-shadow 4s ease-in-out infinite;
+}
+
 .pdn-sticker-shadow {
   box-shadow: 5px 5px 0 var(--night-950);
+}
+
+.pdn-card-shadow {
+  box-shadow: 6px 4px 0 rgba(5, 5, 5, 0.8);
+}
+
+.pdn-card-shadow-sm {
+  box-shadow: 6px 4px 0 rgba(5, 5, 5, 0.8);
+}
+
+.pdn-pressable {
+  cursor: pointer;
+  transform: translate(0, 0);
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease, border-color 120ms ease;
+  will-change: transform, box-shadow;
+  position: relative;
+}
+
+.pdn-pressable::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 235, 170, 0.42) 0%, rgba(255, 235, 170, 0) 80%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 20;
+  will-change: opacity;
+}
+
+.pdn-pressable.pdn-clicked::after {
+  animation: pdn-backlight-glow 200ms ease-out forwards;
+}
+
+@keyframes pdn-backlight-glow {
+  0% {
+    opacity: 0;
+  }
+  30%, 75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.pdn-pressable:active:not(:disabled) {
+  transform: translate(4px, 3px);
+  box-shadow: 2px 1px 0 rgba(5, 5, 5, 0.8);
+  filter: saturate(1.02);
+}
+
+/* Soft tactile backlight for active clicks */
+.pdn-pressable.pdn-clicked {
+  animation: pdn-backlight-transform 200ms ease-out forwards;
+}
+
+@keyframes pdn-backlight-transform {
+  0% {
+    transform: translate(0, 0);
+    box-shadow: 6px 4px 0 rgba(5, 5, 5, 0.8);
+    filter: brightness(1) saturate(1);
+  }
+  30%, 75% {
+    transform: translate(4px, 3px);
+    box-shadow: 2px 1px 0 rgba(5, 5, 5, 0.8);
+    filter: brightness(1.08) saturate(1.04);
+  }
+  100% {
+    transform: translate(4px, 3px);
+    box-shadow: 2px 1px 0 rgba(5, 5, 5, 0.8);
+    filter: brightness(1) saturate(1);
+  }
+}
+
+.pdn-pressable:disabled {
+  cursor: not-allowed;
+  transform: none;
 }
 
 .font-sans,
@@ -231,12 +357,142 @@ button {
 }
 
 .scrollbar-soft::-webkit-scrollbar {
-  width: 10px;
+  display: none !important;
 }
 
-.scrollbar-soft::-webkit-scrollbar-thumb {
-  background: rgba(11, 11, 13, 0.22);
-  border-radius: 999px;
+/* ==========================================================================
+   Micro-Animations for Kiosk Category Screen
+   ========================================================================= */
+
+@keyframes card-glint {
+  0% { transform: translateX(-150%) skewX(-25deg); }
+  40%, 100% { transform: translateX(150%) skewX(-25deg); }
+}
+
+.pdn-glint-shine {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.12) 35%,
+    rgba(255, 255, 255, 0.38) 50%,
+    rgba(255, 255, 255, 0.12) 65%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+@keyframes steam-rise {
+  0% { transform: translateY(8px) scale(0.92); opacity: 0; }
+  20% { opacity: 0.38; }
+  80% { transform: translateY(-18px) scale(1.06); opacity: 0.12; }
+  100% { transform: translateY(-34px) scale(0.85); opacity: 0; }
+}
+@keyframes star-sparkle {
+  0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.05) rotate(180deg); opacity: 0.95; }
+}
+@keyframes float-drift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-7px) rotate(1.2deg); }
+}
+@keyframes shadow-sync {
+  0%, 100% { transform: scale(1); opacity: 0.28; }
+  50% { transform: scale(0.86); opacity: 0.15; }
+}
+@keyframes scale-breath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.012); }
+}
+@keyframes neon-glow-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(244, 196, 0, 0.25), 6px 4px 0 rgba(5, 5, 5, 0.8); }
+  50% { box-shadow: 0 0 24px rgba(244, 196, 0, 0.65), 6px 4px 0 rgba(5, 5, 5, 0.8); }
+}
+@keyframes card-wobble {
+  0%, 100% { transform: rotate(-0.35deg); }
+  50% { transform: rotate(0.35deg); }
+}
+
+.animate-card-glint { animation: card-glint 11s cubic-bezier(0.25, 1, 0.5, 1) infinite; will-change: transform; }
+.animate-steam-rise { animation: steam-rise 4.2s ease-in-out infinite; will-change: transform, opacity; }
+.animate-star-sparkle { animation: star-sparkle 3.5s ease-in-out infinite; will-change: transform, opacity; }
+.animate-float-drift { animation: float-drift 4s ease-in-out infinite; will-change: transform; }
+.animate-shadow-sync { animation: shadow-sync 4s ease-in-out infinite; will-change: transform, opacity; }
+.animate-scale-breath { animation: scale-breath 6s ease-in-out infinite; will-change: transform; }
+.animate-neon-glow { animation: neon-glow-pulse 3s ease-in-out infinite; will-change: box-shadow; }
+.animate-card-wobble { animation: card-wobble 7s ease-in-out infinite; will-change: transform; }
+
+@keyframes best-seller-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 8px rgba(244, 196, 0, 0.15);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 22px rgba(244, 196, 0, 0.55);
+  }
+}
+
+@keyframes composer-blink {
+  0%, 49% {
+    background-color: var(--gold-500);
+    box-shadow: 6px 4px 0 rgba(5, 5, 5, 0.8);
+  }
+  50%, 100% {
+    background-color: #ffea00;
+    box-shadow: 0 0 14px rgba(255, 234, 0, 0.65), 6px 4px 0 rgba(5, 5, 5, 0.8);
+  }
+}
+
+.animate-best-seller {
+  animation: best-seller-pulse 3s ease-in-out infinite;
+  will-change: transform, box-shadow;
+}
+
+.animate-composer {
+  animation: composer-blink 1.5s infinite;
+  will-change: background-color, box-shadow;
+}
+
+/* Neon click states for category cards */
+.pdn-neon-yellow:active,
+.pdn-neon-yellow.pdn-clicked {
+  background-color: #ffea00 !important;
+  box-shadow: 0 0 16px rgba(255, 234, 0, 0.75), 6px 4px 0 rgba(5, 5, 5, 0.8) !important;
+}
+
+.pdn-neon-orange:active,
+.pdn-neon-orange.pdn-clicked {
+  background-color: #fffdf5 !important;
+  box-shadow: 0 0 16px rgba(255, 253, 245, 0.75), 6px 4px 0 rgba(5, 5, 5, 0.8) !important;
+}
+
+.pdn-neon-red:active,
+.pdn-neon-red.pdn-clicked,
+.pdn-neon-blue:active,
+.pdn-neon-blue.pdn-clicked,
+.pdn-neon-green:active,
+.pdn-neon-green.pdn-clicked,
+.pdn-neon-pink:active,
+.pdn-neon-pink.pdn-clicked {
+  background-color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.9), 6px 4px 0 rgba(5, 5, 5, 0.8) !important;
+}
+
+@keyframes phone-vibrate {
+  0% { transform: translate(0, 0); }
+  2% { transform: translate(-1px, 1px); }
+  4% { transform: translate(1.2px, -1.2px); }
+  6% { transform: translate(-1.2px, -0.8px); }
+  8% { transform: translate(1px, 1.2px); }
+  10% { transform: translate(-1.2px, -1px); }
+  12% { transform: translate(1px, 1px); }
+  14% { transform: translate(-1px, -1.2px); }
+  16% { transform: translate(1.2px, 1px); }
+  18% { transform: translate(-1px, 1px); }
+  20%, 100% { transform: translate(0, 0); }
+}
+
+.animate-vibrate {
+  animation: phone-vibrate 5s ease-in-out infinite;
+  will-change: transform;
 }
 
 @media print {

@@ -7,6 +7,23 @@ export type SelectedSupplement = {
   unitPrice: number | null;
 };
 
+export type SelectedIngredientExtra = {
+  id: string;
+  name: string;
+  unitPrice: number;
+  isSauce: boolean;
+  isFree: boolean;
+};
+
+export type IngredientExtraSummary = {
+  freeAllowance: number;
+  freeCount: number;
+  paidCount: number;
+  paidUnitPrice: number;
+  total: number;
+  items: SelectedIngredientExtra[];
+};
+
 export type HalfHalfSelection = {
   leftPizzaId: string;
   leftPizzaName: string;
@@ -40,6 +57,7 @@ export type CartItem = {
   lineTotal: number;
   halfHalf?: HalfHalfSelection;
   customPizza?: CustomPizzaSelection;
+  ingredientExtras?: IngredientExtraSummary;
   notes?: string;
 };
 

@@ -8,7 +8,7 @@ import { ingredients } from "@/data/ingredients";
 import { products } from "@/data/products";
 import { supplements } from "@/data/supplements";
 import { buildCustomPizzaCartItem, buildHalfHalfCartItem } from "@/features/cart/cart.service";
-import { getSupplementUnitPrice } from "@/features/pricing/pricing.service";
+import { calculateIngredientExtras, getSupplementUnitPrice, isSauceIngredient } from "@/features/pricing/pricing.service";
 import { formatPrice } from "@/lib/utils/format";
 import type { CartItem } from "@/types/cart";
 import type { Ingredient, PizzaBaseId, Product } from "@/types/menu";
@@ -19,29 +19,43 @@ type BuilderProps = {
 };
 
 export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
-  const [formatId, setFormatId] = useState("31cm");
+  const [formatId, setFormatId] = useState("1-2m");
   const [baseId, setBaseId] = useState<PizzaBaseId>("tomato");
   const [leftPizzaId, setLeftPizzaId] = useState("");
   const [rightPizzaId, setRightPizzaId] = useState("");
   const [activeHalf, setActiveHalf] = useState<"left" | "right">("left");
+  const [extraIngredientIds, setExtraIngredientIds] = useState<string[]>([]);
   const [cheesyCrust, setCheesyCrust] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const allowedHalfHalfFormats = ["1-2m", "60cm"];
 
   const format = formats.find((item) => item.id === formatId) ?? formats[0];
   const base = bases.find((item) => item.id === baseId) ?? bases[0];
   const basePizzas = products.filter((product) => product.productType === "pizza" && product.baseId === baseId);
   const leftPizza = basePizzas.find((pizza) => pizza.id === leftPizzaId);
   const rightPizza = basePizzas.find((pizza) => pizza.id === rightPizzaId);
+  const extraIngredients = useMemo(
+    () => ingredients.filter((ingredient) => extraIngredientIds.includes(ingredient.id)),
+    [extraIngredientIds]
+  );
+  const ingredientPricing = calculateIngredientExtras(extraIngredients, 3);
   const cheesyPrice = getSupplementUnitPrice(supplements[0], formatId) ?? 0;
-  const total = format.price + (cheesyCrust ? cheesyPrice : 0);
+  const total = format.price + (cheesyCrust ? cheesyPrice : 0) + ingredientPricing.total;
   const canAdd = Boolean(leftPizza && rightPizza && leftPizza.id !== rightPizza.id);
+
+  function toggleExtraIngredient(ingredient: Ingredient) {
+    setError(null);
+    setExtraIngredientIds((current) =>
+      current.includes(ingredient.id) ? current.filter((id) => id !== ingredient.id) : [...current, ingredient.id]
+    );
+  }
 
   function choosePizza(pizza: Product) {
     setError(null);
 
     if (activeHalf === "left") {
       if (pizza.id === rightPizzaId) {
-        setError("Cette pizza est déjà choisie pour la moitié droite.");
+        setError("Cette pizza est dÃ©jÃ  choisie pour la moitiÃ© droite.");
         return;
       }
 
@@ -51,7 +65,7 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
     }
 
     if (pizza.id === leftPizzaId) {
-      setError("Cette pizza est déjà choisie pour la moitié gauche.");
+      setError("Cette pizza est dÃ©jÃ  choisie pour la moitiÃ© gauche.");
       return;
     }
 
@@ -65,7 +79,7 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
     }
 
     if (leftPizza.id === rightPizza.id) {
-      setError("Choisissez deux pizzas différentes pour le Moit’-Moit’.");
+      setError("Choisissez deux pizzas différentes pour le MOIT’-MOIT’.");
       return;
     }
 
@@ -78,7 +92,8 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
       cheesyCrust,
       formats,
       bases,
-      supplements
+      supplements,
+      extraIngredients
     });
     onAdd(item);
   }
@@ -104,6 +119,7 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
           formatId={formatId}
           baseId={baseId}
           onFormat={setFormatId}
+          allowedFormatIds={allowedHalfHalfFormats}
           onBase={(id) => {
             setBaseId(id);
             setLeftPizzaId("");
@@ -113,7 +129,7 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
           }}
         />
 
-        <section className="rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
+        <section className="pdn-card-shadow rounded-[18px] border-[3px] border-black bg-white p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="pdn-label text-lg text-[var(--red-500)]">3. Choisissez les deux recettes</p>
@@ -140,10 +156,18 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
           />
         </section>
 
+        <IngredientPicker
+          title="4. Suppléments ingrédients"
+          description="3 ingrédients offerts, sauces gratuites, +1€ ensuite."
+          selectedIds={extraIngredientIds}
+          onToggle={toggleExtraIngredient}
+          freeAllowance={3}
+          pricing={ingredientPricing}
+        />
         <CheesyCrustToggle checked={cheesyCrust} formatId={formatId} onChange={setCheesyCrust} />
         {error ? <p className="pdn-title rounded-xl bg-red-100 p-3 text-sm text-[var(--red-600)]">{error}</p> : null}
         <BuilderTotalBar
-          label="Total Moit’-Moit’"
+          label="Total MOIT’-MOIT’"
           total={total}
           onAdd={addToCart}
           disabled={!canAdd}
@@ -168,8 +192,9 @@ export function CustomPizzaBuilderScreen({ onAdd }: BuilderProps) {
     () => ingredients.filter((ingredient) => selectedIds.includes(ingredient.id)),
     [selectedIds]
   );
+  const ingredientPricing = calculateIngredientExtras(selectedIngredients, 6);
   const cheesyPrice = getSupplementUnitPrice(supplements[0], formatId) ?? 0;
-  const total = format.price + (cheesyCrust ? cheesyPrice : 0);
+  const total = format.price + (cheesyCrust ? cheesyPrice : 0) + ingredientPricing.total;
   const canAdd = selectedIngredients.length > 0;
 
   function toggleIngredient(ingredient: Ingredient) {
@@ -210,9 +235,9 @@ export function CustomPizzaBuilderScreen({ onAdd }: BuilderProps) {
   return (
     <BuilderLayout
       eyebrow="Composition sur mesure"
-      title="CRÉEZ VOTRE"
+      title="CRÃ‰EZ VOTRE"
       highlight="PIZZA"
-      subtitle="Choisissez une base, un format et jusqu'à huit ingrédients."
+      subtitle="Choisissez une base, un format et jusqu'Ã  huit ingrÃ©dients."
     >
       <div className="space-y-5 p-5 pt-0">
         <CustomPizzaLivePreview
@@ -223,7 +248,15 @@ export function CustomPizzaBuilderScreen({ onAdd }: BuilderProps) {
         />
 
         <FormatBasePanel formatId={formatId} baseId={baseId} onFormat={setFormatId} onBase={setBaseId} />
-        <IngredientPicker selectedIds={selectedIds} onToggle={toggleIngredient} maxIngredients={maxIngredients} />
+        <IngredientPicker
+          title="3. Choisissez vos ingrÃ©dients"
+          description="6 ingrÃ©dients inclus, sauces gratuites, +1â‚¬ ensuite."
+          selectedIds={selectedIds}
+          onToggle={toggleIngredient}
+          maxIngredients={maxIngredients}
+          freeAllowance={6}
+          pricing={ingredientPricing}
+        />
         <CheesyCrustToggle checked={cheesyCrust} formatId={formatId} onChange={setCheesyCrust} />
         {error ? <p className="pdn-title rounded-xl bg-red-100 p-3 text-sm text-[var(--red-600)]">{error}</p> : null}
         <BuilderTotalBar
@@ -231,7 +264,7 @@ export function CustomPizzaBuilderScreen({ onAdd }: BuilderProps) {
           total={total}
           onAdd={addToCart}
           disabled={!canAdd}
-          helper={canAdd ? `${selectedIngredients.length} ingrédient${selectedIngredients.length > 1 ? "s" : ""} sélectionné${selectedIngredients.length > 1 ? "s" : ""}.` : "Choisissez au moins un ingrédient."}
+          helper={canAdd ? `${selectedIngredients.length} ingrÃ©dient${selectedIngredients.length > 1 ? "s" : ""} sÃ©lectionnÃ©${selectedIngredients.length > 1 ? "s" : ""}.` : "Choisissez au moins un ingrÃ©dient."}
         />
       </div>
     </BuilderLayout>
@@ -273,26 +306,30 @@ function FormatBasePanel({
   formatId,
   baseId,
   onFormat,
-  onBase
+  onBase,
+  allowedFormatIds
 }: {
   formatId: string;
   baseId: PizzaBaseId;
   onFormat: (id: string) => void;
   onBase: (id: PizzaBaseId) => void;
+  allowedFormatIds?: string[];
 }) {
+  const availableFormats = allowedFormatIds ? formats.filter((format) => allowedFormatIds.includes(format.id)) : formats;
+
   return (
-    <section className="rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
+    <section className="pdn-card-shadow rounded-[18px] border-[3px] border-black bg-white p-4">
       <p className="pdn-label mb-3 text-lg">1. Choisissez le format</p>
       <div className="grid grid-cols-2 gap-3">
-        {formats.map((format) => (
+        {availableFormats.map((format) => (
           <button
             key={format.id}
             onClick={() => onFormat(format.id)}
-            className={`pdn-label min-h-12 rounded-xl border-2 px-3 text-lg ${
-              formatId === format.id ? "border-black bg-[var(--gold-500)]" : "border-black/20 bg-[#fffdf6]"
+            className={`pdn-label pdn-pressable min-h-12 rounded-xl border-2 px-3 text-lg ${
+              formatId === format.id ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]" : "border-black/20 bg-[#fffdf6]"
             }`}
           >
-            {format.label} ({format.price}€)
+            {format.label} ({format.price}â‚¬)
           </button>
         ))}
       </div>
@@ -302,13 +339,13 @@ function FormatBasePanel({
           <button
             key={base.id}
             onClick={() => onBase(base.id)}
-            className={`pdn-label min-h-12 rounded-xl border-2 px-3 text-lg ${
+            className={`pdn-label pdn-pressable min-h-12 rounded-xl border-2 px-3 text-lg ${
               baseId === base.id
-                ? "border-black bg-[var(--red-500)] text-white"
+                ? "pdn-card-shadow-sm border-black bg-[var(--red-500)] text-white"
                 : "border-black/20 bg-[#fffdf6]"
             }`}
           >
-            {base.id === "tomato" ? "🍅 " : "🥛 "}
+            {base.id === "tomato" ? "ðŸ… " : "ðŸ¥› "}
             {base.name}
           </button>
         ))}
@@ -368,23 +405,23 @@ function HalfHalfLivePreview({
               </div>
             )}
             <div className="absolute left-1/2 top-[9%] h-[82%] w-[4px] -translate-x-1/2 rounded-full bg-black shadow-[0_0_0_2px_rgba(255,196,0,0.75)]" />
-            <div className="pdn-label absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-sm shadow-[3px_3px_0_#050505]">
+            <div className="pdn-card-shadow-sm pdn-label absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-sm">
               50/50
             </div>
           </div>
           <span className="pdn-label absolute left-0 top-5 rotate-[-7deg] rounded border-2 border-black bg-white px-2 py-1 text-sm">
-            A {leftPizza?.name ?? "à choisir"}
+            A {leftPizza?.name ?? "Ã  choisir"}
           </span>
           <span className="pdn-label absolute bottom-5 right-0 rotate-[7deg] rounded border-2 border-black bg-white px-2 py-1 text-sm">
-            B {rightPizza?.name ?? "à choisir"}
+            B {rightPizza?.name ?? "Ã  choisir"}
           </span>
         </div>
 
         <div className="space-y-3">
           <div>
-            <p className="pdn-label text-lg text-[var(--red-500)]">Aperçu en direct</p>
+            <p className="pdn-label text-lg text-[var(--red-500)]">AperÃ§u en direct</p>
             <h2 className="pdn-title text-2xl leading-tight">
-              {leftPizza?.name ?? "Moitié gauche"} / {rightPizza?.name ?? "Moitié droite"}
+              {leftPizza?.name ?? "MoitiÃ© gauche"} / {rightPizza?.name ?? "MoitiÃ© droite"}
             </h2>
           </div>
           <div className="pdn-label grid grid-cols-2 gap-2 text-base">
@@ -394,21 +431,21 @@ function HalfHalfLivePreview({
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => onActiveHalf("left")}
-              className={`pdn-label min-h-14 rounded-xl border-2 px-3 text-left text-base ${
-                activeHalf === "left" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-white"
+              className={`pdn-label pdn-pressable min-h-14 rounded-xl border-2 px-3 text-left text-base ${
+                activeHalf === "left" ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]" : "border-black/20 bg-white"
               }`}
             >
               <span className="block text-sm text-[var(--red-500)]">Choisir A</span>
-              {leftPizza?.name ?? "Moitié gauche"}
+              {leftPizza?.name ?? "MoitiÃ© gauche"}
             </button>
             <button
               onClick={() => onActiveHalf("right")}
-              className={`pdn-label min-h-14 rounded-xl border-2 px-3 text-left text-base ${
-                activeHalf === "right" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-white"
+              className={`pdn-label pdn-pressable min-h-14 rounded-xl border-2 px-3 text-left text-base ${
+                activeHalf === "right" ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]" : "border-black/20 bg-white"
               }`}
             >
               <span className="block text-sm text-[var(--red-500)]">Choisir B</span>
-              {rightPizza?.name ?? "Moitié droite"}
+              {rightPizza?.name ?? "MoitiÃ© droite"}
             </button>
           </div>
         </div>
@@ -432,21 +469,21 @@ function HalfPickerTabs({
     <div className="mt-4 grid grid-cols-2 gap-3">
       <button
         onClick={() => onActiveHalf("left")}
-        className={`pdn-label min-h-16 rounded-xl border-2 px-3 text-left text-lg ${
-          activeHalf === "left" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-[#fffdf6]"
+        className={`pdn-label pdn-pressable min-h-16 rounded-xl border-2 px-3 text-left text-lg ${
+          activeHalf === "left" ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]" : "border-black/20 bg-[#fffdf6]"
         }`}
       >
-        <span className="block text-sm text-[var(--red-500)]">Moitié gauche (A)</span>
-        <span className="text-sm">{leftPizza?.name ?? "À choisir"}</span>
+        <span className="block text-sm text-[var(--red-500)]">MoitiÃ© gauche (A)</span>
+        <span className="text-sm">{leftPizza?.name ?? "Ã€ choisir"}</span>
       </button>
       <button
         onClick={() => onActiveHalf("right")}
-        className={`pdn-label min-h-16 rounded-xl border-2 px-3 text-left text-lg ${
-          activeHalf === "right" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-[#fffdf6]"
+        className={`pdn-label pdn-pressable min-h-16 rounded-xl border-2 px-3 text-left text-lg ${
+          activeHalf === "right" ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]" : "border-black/20 bg-[#fffdf6]"
         }`}
       >
-        <span className="block text-sm text-[var(--red-500)]">Moitié droite (B)</span>
-        <span className="text-sm">{rightPizza?.name ?? "À choisir"}</span>
+        <span className="block text-sm text-[var(--red-500)]">MoitiÃ© droite (B)</span>
+        <span className="text-sm">{rightPizza?.name ?? "Ã€ choisir"}</span>
       </button>
     </div>
   );
@@ -478,10 +515,10 @@ function PizzaChoiceGrid({
             key={pizza.id}
             onClick={() => onPick(pizza)}
             disabled={unavailable}
-            className={`relative min-h-[128px] rounded-[16px] border-2 p-3 text-left transition active:translate-y-1 disabled:cursor-not-allowed disabled:opacity-55 ${
+            className={`pdn-pressable relative min-h-[128px] rounded-[16px] border-2 p-3 text-left disabled:cursor-not-allowed disabled:opacity-55 ${
               selected
-                ? "border-black bg-[var(--gold-500)] shadow-[4px_4px_0_#050505]"
-                : "border-black/15 bg-[#fffdf6] shadow-[2px_2px_0_rgba(0,0,0,0.12)]"
+                ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]"
+                : "pdn-card-shadow-sm border-black/15 bg-[#fffdf6]"
             }`}
           >
             <div className="flex gap-3">
@@ -499,7 +536,7 @@ function PizzaChoiceGrid({
             {selectedRight ? <HalfBadge label="Droite B" /> : null}
             {unavailable ? (
               <span className="pdn-label absolute inset-x-3 bottom-3 rounded-full bg-black px-3 py-1 text-center text-sm text-white">
-                Déjà choisie
+                DÃ©jÃ  choisie
               </span>
             ) : null}
           </button>
@@ -537,7 +574,7 @@ function CustomPizzaLivePreview({
           <div className="relative h-full w-full overflow-hidden rounded-full border-[3px] border-black bg-white drop-shadow-2xl">
             <img src="/image/photo section hero.png" alt="" className="h-full w-full scale-125 object-cover" />
             <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_45%,rgba(255,196,0,0.18)_72%)]" />
-            <div className="pdn-label absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-center text-base leading-tight shadow-[3px_3px_0_#050505]">
+            <div className="pdn-card-shadow-sm pdn-label absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-center text-base leading-tight">
               {selectedIngredients.length}/{maxIngredients}
             </div>
           </div>
@@ -554,7 +591,7 @@ function CustomPizzaLivePreview({
             return (
               <span
                 key={ingredient.id}
-                className={`absolute ${positions[index]} grid h-14 w-14 place-items-center rounded-full border-2 border-black bg-white shadow-[3px_3px_0_#050505]`}
+                className={`pdn-card-shadow-sm absolute ${positions[index]} grid h-14 w-14 place-items-center rounded-full border-2 border-black bg-white`}
               >
                 <img src={ingredient.image} alt="" className="h-10 w-10 object-contain" />
               </span>
@@ -564,8 +601,8 @@ function CustomPizzaLivePreview({
 
         <div className="space-y-3">
           <div>
-            <p className="pdn-label text-lg text-[var(--red-500)]">Aperçu en direct</p>
-            <h2 className="pdn-title text-2xl leading-tight">Pizza personnalisée</h2>
+            <p className="pdn-label text-lg text-[var(--red-500)]">AperÃ§u en direct</p>
+            <h2 className="pdn-title text-2xl leading-tight">Pizza personnalisÃ©e</h2>
           </div>
           <div className="pdn-label grid grid-cols-2 gap-2 text-base">
             <span className="rounded-lg border-2 border-black bg-white px-2 py-2">Taille : {formatLabel}</span>
@@ -581,7 +618,7 @@ function CustomPizzaLivePreview({
             </div>
           ) : (
             <div className="pdn-label rounded-xl border-2 border-dashed border-black/35 bg-white px-3 py-3 text-lg text-[var(--neutral-700)]">
-              Touchez vos ingrédients préférés.
+              Touchez vos ingrÃ©dients prÃ©fÃ©rÃ©s.
             </div>
           )}
         </div>
@@ -591,36 +628,48 @@ function CustomPizzaLivePreview({
 }
 
 function IngredientPicker({
+  title,
+  description,
   selectedIds,
   onToggle,
-  maxIngredients
+  maxIngredients,
+  freeAllowance,
+  pricing
 }: {
+  title: string;
+  description: string;
   selectedIds: string[];
   onToggle: (ingredient: Ingredient) => void;
-  maxIngredients: number;
+  maxIngredients?: number;
+  freeAllowance: number;
+  pricing: ReturnType<typeof calculateIngredientExtras>;
 }) {
   return (
-    <section className="rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
+    <section className="pdn-card-shadow rounded-[18px] border-[3px] border-black bg-white p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="pdn-label text-lg text-[var(--red-500)]">3. Choisissez vos ingrédients</p>
-          <p className="text-sm font-bold text-[var(--neutral-700)]">Ils sont inclus tant que les prix suppléments ne sont pas confirmés.</p>
+          <p className="pdn-label text-lg text-[var(--red-500)]">{title}</p>
+          <p className="text-sm font-bold text-[var(--neutral-700)]">{description}</p>
+          <p className="pdn-label mt-2 text-base text-black">
+            {pricing.freeCount}/{freeAllowance} offerts · {pricing.paidCount} payant{pricing.paidCount > 1 ? "s" : ""} · +{formatPrice(pricing.total)}
+          </p>
         </div>
-        <span className={`pdn-label rounded-full px-3 py-1 text-base text-white ${selectedIds.length >= maxIngredients ? "bg-[var(--red-500)]" : "bg-black"}`}>
-          {selectedIds.length}/{maxIngredients}
+        <span className={`pdn-label rounded-full px-3 py-1 text-base text-white ${maxIngredients && selectedIds.length >= maxIngredients ? "bg-[var(--red-500)]" : "bg-black"}`}>
+          {selectedIds.length}{maxIngredients ? `/${maxIngredients}` : ""}
         </span>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-3">
         {ingredients.map((ingredient) => {
           const selected = selectedIds.includes(ingredient.id);
-          const limitReached = selectedIds.length >= maxIngredients && !selected;
+          const limitReached = Boolean(maxIngredients && selectedIds.length >= maxIngredients && !selected);
+          const isSauce = isSauceIngredient(ingredient);
           return (
             <button
               key={ingredient.id}
               onClick={() => onToggle(ingredient)}
               disabled={limitReached}
-              className={`relative min-h-32 rounded-[16px] border-2 p-2 text-center transition active:translate-y-1 disabled:cursor-not-allowed disabled:opacity-45 ${
-                selected ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/15 bg-[#fffdf6] shadow-[2px_2px_0_rgba(0,0,0,0.1)]"
+              className={`pdn-pressable relative min-h-32 rounded-[16px] border-2 p-2 text-center disabled:cursor-not-allowed disabled:opacity-45 ${
+                selected ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]" : "pdn-card-shadow-sm border-black/15 bg-[#fffdf6]"
               }`}
             >
               {selected ? (
@@ -632,6 +681,7 @@ function IngredientPicker({
                 <img src={ingredient.image} alt="" className="h-12 w-12 object-contain" />
               </span>
               <span className="pdn-title mt-2 block text-[11px] leading-tight">{ingredient.name}</span>
+              {isSauce ? <span className="pdn-label mt-1 block text-sm text-[var(--red-500)]">Sauce gratuite</span> : null}
               {limitReached ? <span className="pdn-label mt-1 block text-sm text-[var(--red-500)]">Max atteint</span> : null}
             </button>
           );
@@ -653,7 +703,7 @@ function CheesyCrustToggle({
   const price = getSupplementUnitPrice(supplements[0], formatId);
 
   return (
-    <label className="flex items-center justify-between gap-4 rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
+    <label className="pdn-card-shadow pdn-pressable flex items-center justify-between gap-4 rounded-[18px] border-[3px] border-black bg-white p-4">
       <span>
         <span className="pdn-title block text-sm">Cheesy Crust</span>
         <span className="text-xs font-semibold">Bordure farcie au fromage fondu (+{formatPrice(price)})</span>
@@ -682,11 +732,11 @@ function BuilderTotalBar({
   helper?: string;
 }) {
   return (
-    <section className="sticky bottom-0 z-20 -mx-5 flex items-center justify-between gap-3 border-[3px] border-x-0 border-b-0 border-black bg-black p-4 text-white shadow-[0_-5px_0_var(--gold-500)]">
+    <section className="sticky bottom-0 z-20 -mx-5 flex items-center justify-between gap-3 border-[3px] border-x-0 border-b-0 border-black bg-[var(--gold-500)] p-4 text-black shadow-[0_-5px_0_var(--night-950)]">
       <span>
-        <span className="pdn-label block text-lg text-[var(--gold-500)]">{label}</span>
+        <span className="pdn-label block text-lg text-[var(--red-500)]">{label}</span>
         <span className="pdn-title block text-4xl">{formatPrice(total)}</span>
-        {helper ? <span className="block text-xs font-bold text-white/75">{helper}</span> : null}
+        {helper ? <span className="block text-xs font-extrabold text-black/70">{helper}</span> : null}
       </span>
       <Button onClick={onAdd} disabled={disabled} className="min-w-48 rounded-full">
         <span className="inline-flex items-center gap-1">

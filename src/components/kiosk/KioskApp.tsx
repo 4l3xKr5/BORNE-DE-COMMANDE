@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Minus, Plus, Printer, ShoppingCart, Trash2 } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Check, Minus, Plus, Printer, ShoppingCart, Trash2 } from "lucide-react";
 import { bases } from "@/data/bases";
 import { categories } from "@/data/categories";
 import { formats } from "@/data/formats";
+import { ingredients } from "@/data/ingredients";
 import { products } from "@/data/products";
 import { settings } from "@/data/settings";
 import { supplements } from "@/data/supplements";
 import { buildCartItem, updateCartItemQuantity } from "@/features/cart/cart.service";
-import { calculateCartTotals } from "@/features/pricing/pricing.service";
+import { calculateCartTotals, calculateIngredientExtras, isSauceIngredient } from "@/features/pricing/pricing.service";
 import { formatPrice } from "@/lib/utils/format";
 import type { CartItem } from "@/types/cart";
 import type { Category, Product } from "@/types/menu";
@@ -21,41 +22,42 @@ import { CustomPizzaBuilderScreen, HalfHalfBuilderScreen } from "@/components/ki
 
 type Screen = "home" | "categories" | "products" | "detail" | "halfHalfBuilder" | "customPizzaBuilder" | "cart" | "review" | "confirmation";
 
+function handleInteractiveClick(event: React.MouseEvent<HTMLElement>, callback: () => void) {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const target = event.currentTarget;
+  if (!target) {
+    callback();
+    return;
+  }
+  
+  target.classList.add("pdn-clicked");
+  
+  setTimeout(() => {
+    target.classList.remove("pdn-clicked");
+    callback();
+  }, 200);
+}
+
 export function KioskApp() {
   const [screen, setScreen] = useState<Screen>("home");
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedFormatId, setSelectedFormatId] = useState<string>("31cm");
   const [cheesySelected, setCheesySelected] = useState(false);
+  const [selectedExtraIngredientIds, setSelectedExtraIngredientIds] = useState<string[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [transitioning, setTransitioning] = useState(false);
+  const startOrderLockRef = useRef(false);
 
   const totals = useMemo(() => calculateCartTotals(cartItems), [cartItems]);
   const categoryProducts = products.filter((product) => product.categoryId === selectedCategory?.id);
   const isBuilderScreen = screen === "halfHalfBuilder" || screen === "customPizzaBuilder";
   const showFooter = screen !== "home" && !isBuilderScreen && screen !== "confirmation";
   const showHeaderCart = screen !== "home" && screen !== "confirmation";
-
-  useEffect(() => {
-    const markActivity = () => setLastActivity(Date.now());
-    window.addEventListener("pointerdown", markActivity);
-    window.addEventListener("keydown", markActivity);
-    return () => {
-      window.removeEventListener("pointerdown", markActivity);
-      window.removeEventListener("keydown", markActivity);
-    };
-  }, []);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      if (screen !== "home" && Date.now() - lastActivity > settings.inactivityTimeoutSeconds * 1000) {
-        resetSession();
-      }
-    }, 1000);
-    return () => window.clearInterval(interval);
-  }, [lastActivity, screen]);
 
   useEffect(() => {
     if (screen !== "confirmation") return;
@@ -69,15 +71,50 @@ export function KioskApp() {
     setSelectedProduct(null);
     setSelectedFormatId("31cm");
     setCheesySelected(false);
+    setSelectedExtraIngredientIds([]);
     setCartItems([]);
     setOrder(null);
     setError(null);
+  }
+
+  function startOrder() {
+    if (startOrderLockRef.current) return;
+    startOrderLockRef.current = true;
+    window.setTimeout(() => {
+      startOrderLockRef.current = false;
+    }, 350);
+
+    setTransitioning(true);
+    window.setTimeout(() => {
+      setTransitioning(false);
+    }, 500);
+
+    setSelectedCategory(null);
+    setSelectedProduct(null);
+    setSelectedFormatId("31cm");
+    setCheesySelected(false);
+    setSelectedExtraIngredientIds([]);
+    setOrder(null);
+    setError(null);
+    setScreen("categories");
+  }
+
+  function handleBack() {
+    if (screen === "categories") {
+      resetSession();
+      return;
+    }
+
+    setSelectedCategory(null);
+    setSelectedProduct(null);
+    setScreen("categories");
   }
 
   function openProduct(product: Product) {
     setSelectedProduct(product);
     setSelectedFormatId(product.availableFormatIds[0] ?? "31cm");
     setCheesySelected(false);
+    setSelectedExtraIngredientIds([]);
     setError(null);
     setScreen("detail");
   }
@@ -93,7 +130,11 @@ export function KioskApp() {
         supplementIds: cheesySelected ? ["cheesy-crust"] : [],
         formats,
         bases,
-        supplements
+        supplements,
+        extraIngredients: selectedProduct.productType === "pizza"
+          ? ingredients.filter((ingredient) => selectedExtraIngredientIds.includes(ingredient.id))
+          : [],
+        ingredientFreeAllowance: 3
       });
       setCartItems((items) => [...items, item]);
       setScreen("cart");
@@ -135,17 +176,21 @@ export function KioskApp() {
 
   return (
     <main className="kiosk-shell">
-      <div className="kiosk-frame flex h-dvh flex-col">
+      <div className={`kiosk-frame flex h-dvh flex-col ${transitioning ? "pointer-events-none" : ""}`}>
         {screen !== "home" && (
-          <header className="no-print flex items-center justify-between bg-[var(--night-950)] px-5 py-4 text-white">
-            <button className="pdn-label flex items-center gap-2 text-lg" onClick={() => setScreen("categories")}>
-              <ArrowLeft size={22} />
+          <header className="no-print relative flex min-h-[112px] items-center justify-between bg-[var(--night-950)] px-7 py-5 text-white z-30">
+            <button className="pdn-label pdn-pressable flex items-center gap-2 text-xl" onClick={(e) => handleInteractiveClick(e, handleBack)}>
+              <ArrowLeft size={24} />
               Retour
             </button>
-            <img src="/image/logo upscale.png" alt="Pizza de Nuit" className="h-14 w-28 object-contain" />
+            <img
+              src="/image/logo upscale.png"
+              alt="Pizza de Nuit"
+              className="absolute left-1/2 -translate-x-1/2 top-[12px] h-[140px] w-[280px] object-contain z-40"
+            />
             {showHeaderCart ? (
-              <button className="relative rounded-full bg-white/10 p-3" onClick={() => setScreen("cart")} aria-label="Panier">
-                <ShoppingCart size={24} />
+              <button className="pdn-pressable relative rounded-full bg-white/10 p-4" onClick={() => setScreen("cart")} aria-label="Panier">
+                <ShoppingCart size={26} />
                 {cartItems.length > 0 ? (
                   <span className="pdn-title absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-[var(--gold-500)] text-[10px] text-black">
                     {cartItems.length}
@@ -160,7 +205,7 @@ export function KioskApp() {
 
         <section className={`no-print min-h-0 flex-1 overflow-y-auto scrollbar-soft ${showFooter ? "pb-36" : "pb-0"}`}>
           {settings.maintenanceMode ? <Maintenance /> : null}
-          {!settings.maintenanceMode && screen === "home" ? <HomeScreen onStart={() => setScreen("categories")} /> : null}
+          {!settings.maintenanceMode && screen === "home" ? <HomeScreen onStart={startOrder} /> : null}
           {!settings.maintenanceMode && screen === "categories" ? (
             <CategoryScreen
               onSelect={(category) => {
@@ -181,6 +226,8 @@ export function KioskApp() {
               setSelectedFormatId={setSelectedFormatId}
               cheesySelected={cheesySelected}
               setCheesySelected={setCheesySelected}
+              selectedExtraIngredientIds={selectedExtraIngredientIds}
+              setSelectedExtraIngredientIds={setSelectedExtraIngredientIds}
               error={error}
               onAdd={addSelectedProduct}
             />
@@ -213,7 +260,7 @@ export function KioskApp() {
         {order ? <TicketPrintable order={order} /> : null}
 
         {showFooter ? (
-          <footer className="kiosk-footer no-print fixed inset-x-0 bottom-0 mx-auto border-t-2 border-[var(--night-950)] bg-white p-4 shadow-2xl">
+          <footer className="kiosk-footer no-print fixed inset-x-0 bottom-0 mx-auto border-t-[3px] border-[var(--night-950)] bg-[var(--gold-500)] p-4 shadow-[0_-5px_0_var(--night-950)]">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="pdn-label text-base text-[var(--neutral-500)]">Total panier</p>
@@ -221,17 +268,17 @@ export function KioskApp() {
                 <p className="text-xs font-bold">Paiement au comptoir après impression du ticket.</p>
               </div>
               {screen === "cart" ? (
-                <Button disabled={cartItems.length === 0} onClick={() => setScreen("review")} className="min-w-56">
+                <Button disabled={cartItems.length === 0} onClick={(e) => handleInteractiveClick(e, () => setScreen("review"))} className="min-w-56">
                   Valider ma commande
                 </Button>
               ) : screen === "review" ? (
-                <Button disabled={cartItems.length === 0} onClick={validateOrder} className="min-w-64">
+                <Button disabled={cartItems.length === 0} onClick={(e) => handleInteractiveClick(e, validateOrder)} className="min-w-64">
                   <span className="inline-flex items-center gap-2">
                     <Printer size={22} /> Valider et imprimer le ticket
                   </span>
                 </Button>
               ) : (
-                <Button variant="secondary" onClick={() => setScreen("cart")} className="min-w-44">
+                <Button variant="secondary" onClick={(e) => handleInteractiveClick(e, () => setScreen("cart"))} className="min-w-44">
                   Voir panier
                 </Button>
               )}
@@ -256,26 +303,6 @@ function Maintenance() {
 
 function HomeScreen({ onStart }: { onStart: () => void }) {
   const [shootingStar, setShootingStar] = useState<{ id: number; top: string; left: string; angle: number } | null>(null);
-
-  useEffect(() => {
-    const homeStart = document.getElementById("kiosk-home-start");
-    if (!homeStart) return;
-
-    const start = (event: Event) => {
-      event.preventDefault();
-      onStart();
-    };
-
-    homeStart.addEventListener("click", start);
-    homeStart.addEventListener("touchend", start, { passive: false });
-    homeStart.addEventListener("pointerup", start);
-
-    return () => {
-      homeStart.removeEventListener("click", start);
-      homeStart.removeEventListener("touchend", start);
-      homeStart.removeEventListener("pointerup", start);
-    };
-  }, [onStart]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -333,9 +360,8 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
 
   return (
     <div
-      id="kiosk-home-start"
-      className="h-full min-h-full bg-[#050507] text-white relative overflow-hidden select-none"
-      onPointerUp={onStart}
+      onClick={(e) => handleInteractiveClick(e, onStart)}
+      className="pdn-pressable h-full min-h-full bg-[#050507] text-white relative overflow-hidden select-none cursor-pointer"
     >
       {/* Embedded High-End CSS styles for keyframes & transitions */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -590,14 +616,7 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
         <div className="relative mb-[280px] flex flex-col items-center gap-6 w-full z-30">
           <button
             type="button"
-            onClick={() => {
-              onStart();
-            }}
-            onPointerUp={(event) => {
-              event.stopPropagation();
-              onStart();
-            }}
-            className="pdn-label animate-pulse-glow z-40 flex min-h-[88px] w-full max-w-[360px] items-center justify-center rounded-full border-2 border-[#f4c400] bg-[#050507]/90 px-8 py-5 text-2xl text-[#f4c400] shadow-[0_0_28px_rgba(244,196,0,0.28)] backdrop-blur-sm transition duration-100 ease-out active:scale-95 cursor-pointer"
+            className="pdn-label animate-pulse-glow z-40 flex min-h-[88px] w-full max-w-[360px] items-center justify-center rounded-full border-2 border-[#f4c400] bg-[#050507]/90 px-8 py-5 text-2xl text-[#f4c400] shadow-[0_0_28px_rgba(244,196,0,0.28)] backdrop-blur-sm transition duration-100 ease-out pointer-events-none"
           >
             Toucher pour commander
           </button>
@@ -620,52 +639,84 @@ function CategoryScreen({
   const sideCategories = categories.filter((category) => category.type !== "pizza");
 
   return (
-    <div className="flex h-[calc(100dvh-14rem)] min-h-[1180px] flex-col bg-[#fffdf6] p-5">
+    <div className="flex h-[calc(100dvh-15rem)] min-h-[1160px] flex-col bg-[#fffdf6] px-7 py-5">
       <section className="flex items-end justify-between gap-4">
         <div>
           <p className="pdn-label text-xl text-[var(--red-500)]">Commande borne</p>
-          <h1 className="pdn-display mt-1 text-[3.45rem] leading-none">Choisis ta catégorie</h1>
+          <h1 className="pdn-display mt-1 text-[3.45rem] leading-none text-[var(--gold-500)] pdn-text-shadow flex items-center gap-3">
+            <svg className="w-8 h-8 text-[var(--red-500)] fill-current animate-star-sparkle" viewBox="0 0 24 24">
+              <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+            </svg>
+            Choisis ta catégorie
+            <svg className="w-8 h-8 text-[var(--gold-500)] fill-current animate-star-sparkle" style={{ animationDelay: '1.5s' }} viewBox="0 0 24 24">
+              <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+            </svg>
+          </h1>
         </div>
-        <div className="pdn-label shrink-0 rounded-full border-2 border-black bg-white px-4 py-2 text-lg shadow-[3px_3px_0_#050505]">
+        <div className="pdn-label pdn-card-shadow-sm shrink-0 rounded-full border-2 border-black bg-white px-4 py-2 text-lg">
           À emporter
         </div>
       </section>
 
-      <div className="mt-5 grid min-h-0 flex-1 grid-rows-[1.35fr_0.68fr_0.62fr_0.58fr] gap-5">
+      <div className="mt-5 grid min-h-0 flex-1 grid-rows-[1.35fr_0.68fr_0.62fr_0.58fr] gap-6">
         <button
-          onClick={onHalfHalf}
-          className="relative h-full min-h-[420px] overflow-hidden rounded-[30px] border-[4px] border-black bg-[var(--gold-500)] text-left shadow-[0_10px_0_#050505] transition active:translate-y-1 active:shadow-[0_5px_0_#050505]"
+          onClick={(e) => handleInteractiveClick(e, onHalfHalf)}
+          className="pdn-pressable pdn-neon-yellow pdn-card-shadow relative h-full min-h-[420px] overflow-hidden rounded-[28px] border-[4px] border-black bg-[var(--gold-500)] text-left"
         >
-          <img src="/image/pizza_moitie_moitie.png" alt="" className="absolute bottom-[-72px] right-[-62px] h-[440px] w-[500px] object-contain drop-shadow-[0_18px_20px_rgba(0,0,0,0.3)]" />
+          {/* Shimmering Glint Overlay */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[inherit] z-20">
+            <div className="absolute top-0 left-0 h-full w-[200%] pdn-glint-shine animate-card-glint" />
+          </div>
+
+          {/* Steam Vector System */}
+          <div className="absolute bottom-[230px] right-[100px] w-32 h-32 pointer-events-none z-10">
+            <svg className="absolute w-5 h-14 text-white/35 fill-none stroke-current stroke-2 animate-steam-rise" style={{ animationDelay: '0s', left: '20%' }} viewBox="0 0 30 150">
+              <path d="M15 150 Q 5 110, 15 80 T 25 20" />
+            </svg>
+            <svg className="absolute w-5 h-14 text-white/35 fill-none stroke-current stroke-2 animate-steam-rise" style={{ animationDelay: '1.6s', left: '60%' }} viewBox="0 0 30 150">
+              <path d="M15 150 Q 25 120, 15 90 T 5 30" />
+            </svg>
+          </div>
+
+          <img src="/image/pizza_moitie_moitie.png" alt="" className="absolute bottom-[-72px] right-[-62px] h-[440px] w-[500px] object-contain animate-pizza-float-shadow z-10" />
           <span className="relative z-10 flex h-full min-h-[420px] max-w-[63%] flex-col justify-between p-8">
-            <span className="pdn-label inline-flex w-fit rounded-full bg-black px-5 py-2 text-xl text-[var(--gold-500)]">
-              Produit phare
+            <span className="pdn-label inline-flex w-fit rounded-full bg-black px-5 py-2 text-xl text-[var(--gold-500)] animate-best-seller">
+              Best seller
             </span>
             <span>
-              <span className="pdn-display block text-[6rem] leading-[0.82] text-black">
-                Moit’-<br />Moit’
+              <span className="pdn-display block whitespace-nowrap text-[6rem] leading-[0.82] text-black">
+                MOIT’-MOIT’
               </span>
               <span className="pdn-copy mt-6 block max-w-xl text-xl font-extrabold leading-tight text-black">
-                Deux recettes différentes sur une même base. Idéal pour partager sans choisir.
+                Composez votre pizza idéale en assemblant deux recettes différentes sur les formats 1/2 mètre et 60 cm. Le partage parfait pour varier les plaisirs !
               </span>
             </span>
-            <span className="pdn-label inline-flex w-fit rounded-full border-2 border-black bg-white px-7 py-3 text-2xl text-black">
+            <span className="pdn-label pdn-card-shadow-sm inline-flex w-fit rounded-full border-2 border-black bg-white px-7 py-3 text-2xl text-black animate-vibrate">
               Créer maintenant
             </span>
           </span>
         </button>
 
-        <div className="grid h-full grid-cols-2 gap-4">
+        <div className="grid h-full grid-cols-2 gap-5">
           {pizzaCategories.map((category) => (
             <button
               key={category.id}
-              onClick={() => onSelect(category)}
-              className="h-full min-h-[190px] overflow-hidden rounded-[22px] border-[3px] border-black bg-white text-left shadow-[0_6px_0_#050505] transition active:translate-y-1 active:shadow-[0_3px_0_#050505]"
+              onClick={(e) => handleInteractiveClick(e, () => onSelect(category))}
+              className={`pdn-pressable pdn-card-shadow h-full min-h-[190px] overflow-hidden rounded-[20px] border-[3px] border-black bg-[var(--paper-100)] text-left ${
+                category.id === "pizzas-tomate" ? "pdn-neon-red" : "pdn-neon-blue"
+              }`}
             >
-              <span className="grid h-full grid-cols-[136px_1fr]">
-                <img src={category.image} alt="" className="h-full min-h-[190px] w-full bg-[var(--paper-100)] object-cover" />
+              <span className="grid h-full grid-cols-[170px_1fr]">
+                <span className="relative grid h-full min-h-[190px] place-items-center p-3 overflow-visible">
+                  {/* Static Image with approved drop shadow */}
+                  <img src={category.image} alt="" className="h-44 w-44 object-contain pdn-product-drop-shadow z-10" />
+                  {/* Steam Vectors for pizzas */}
+                  <svg className="absolute top-4 w-4 h-10 text-black/10 fill-none stroke-current stroke-2 animate-steam-rise" style={{ animationDelay: category.id === 'pizzas-tomate' ? '0s' : '2.1s' }} viewBox="0 0 30 150">
+                    <path d="M15 150 Q 5 110, 15 80 T 25 20" />
+                  </svg>
+                </span>
                 <span className="flex flex-col justify-center p-4">
-                  <span className="pdn-title text-[1.7rem] leading-tight">{category.name}</span>
+                  <span className="pdn-display text-[2.05rem] leading-none">{category.name}</span>
                   <span className="pdn-copy mt-3 text-base font-bold leading-snug text-[var(--neutral-700)]">{category.description}</span>
                 </span>
               </span>
@@ -674,44 +725,63 @@ function CategoryScreen({
         </div>
 
         <button
-          onClick={onCustomPizza}
-          className="h-full min-h-[180px] overflow-hidden rounded-[24px] border-[3px] border-black bg-white text-left shadow-[0_6px_0_#050505] transition active:translate-y-1 active:shadow-[0_3px_0_#050505]"
+          onClick={(e) => handleInteractiveClick(e, onCustomPizza)}
+          className="pdn-pressable pdn-neon-orange pdn-card-shadow relative h-full min-h-[180px] overflow-hidden rounded-[22px] border-[3px] border-black bg-[var(--paper-200)] text-left"
         >
-          <span className="grid h-full grid-cols-[220px_1fr_auto]">
-            <span className="grid place-items-center bg-[var(--paper-100)]">
-              <img src="/image/ingredients/mozzarella.webp" alt="" className="h-36 w-36 object-contain" />
+          <span className="grid h-full grid-cols-[220px_1fr_auto] relative z-10">
+            <span className="grid place-items-center bg-transparent relative p-3 overflow-visible">
+              {/* Pizza ingredients layered on top with dense contact shadow */}
+              <img src="/image/personnalisé.png" alt="" className="h-44 w-44 object-contain z-10 relative pdn-contact-shadow-dense" />
             </span>
             <span className="flex flex-col justify-center p-6">
               <span className="pdn-label text-lg text-[var(--red-500)]">Recette sur mesure</span>
-              <span className="pdn-title mt-1 text-[2.55rem] leading-none">Pizza personnalisée</span>
+              <span className="pdn-display mt-1 text-[2.95rem] leading-none text-[var(--gold-500)] pdn-text-shadow">Pizza personnalisée</span>
               <span className="pdn-copy mt-3 text-lg font-bold leading-snug text-[var(--neutral-700)]">
-                Choisis ton format, ta base et jusqu'à 8 ingrédients.
+                Laissez libre cours à votre créativité ! Choisissez votre base, ajoutez vos ingrédients préférés et créez votre pizza unique.
               </span>
             </span>
             <span className="flex items-center pr-6">
-              <span className="pdn-label rounded-full border-2 border-black bg-[var(--gold-500)] px-6 py-3 text-xl text-black shadow-[3px_3px_0_#050505]">
+              <span className="pdn-label pdn-card-shadow-sm rounded-full border-2 border-black bg-[var(--gold-500)] px-6 py-3 text-xl text-black animate-composer">
                 Composer
               </span>
             </span>
           </span>
         </button>
 
-        <div className="grid h-full grid-cols-2 gap-4">
-          {sideCategories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => onSelect(category)}
-              className="h-full min-h-[170px] overflow-hidden rounded-[20px] border-[3px] border-black bg-white text-left shadow-[0_5px_0_#050505] transition active:translate-y-1 active:shadow-[0_2px_0_#050505]"
-            >
-              <span className="grid h-full grid-cols-[132px_1fr]">
-                <img src={category.image} alt="" className="h-full min-h-[170px] w-full bg-[var(--paper-100)] object-cover" />
-                <span className="flex flex-col justify-center p-5">
-                  <span className="pdn-title text-[1.7rem] leading-tight">{category.name}</span>
-                  <span className="pdn-copy mt-2 text-sm font-bold leading-snug text-[var(--neutral-700)]">{category.description}</span>
+        <div className="grid h-full grid-cols-2 gap-5">
+          {sideCategories.map((category) => {
+            const isDessert = category.id === "desserts";
+            return (
+              <button
+                key={category.id}
+                onClick={(e) => handleInteractiveClick(e, () => onSelect(category))}
+                className={`pdn-pressable pdn-card-shadow h-full min-h-[170px] overflow-hidden rounded-[20px] border-[3px] border-black bg-[var(--paper-100)] text-left ${
+                  category.id === "boissons" ? "pdn-neon-green" : "pdn-neon-pink"
+                }`}
+              >
+                <span className="grid h-full grid-cols-[132px_1fr]">
+                  <span className="grid h-full min-h-[170px] place-items-center p-3 relative overflow-visible">
+                    <img src={category.image} alt="" className="max-h-36 max-w-32 object-contain pdn-product-drop-shadow z-10" />
+                    
+                    {isDessert && (
+                      <div className="absolute inset-0 pointer-events-none z-20">
+                        <svg className="absolute w-4 h-4 text-[var(--gold-500)] fill-current animate-star-sparkle" style={{ top: '20%', left: '15%', animationDelay: '0s' }} viewBox="0 0 24 24">
+                          <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+                        </svg>
+                        <svg className="absolute w-3.5 h-3.5 text-[var(--red-500)] fill-current animate-star-sparkle" style={{ top: '65%', left: '80%', animationDelay: '1.4s' }} viewBox="0 0 24 24">
+                          <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+                        </svg>
+                      </div>
+                    )}
+                  </span>
+                  <span className="flex flex-col justify-center p-5">
+                    <span className="pdn-display text-[2.05rem] leading-none">{category.name}</span>
+                    <span className="pdn-copy mt-2 text-sm font-bold leading-snug text-[var(--neutral-700)]">{category.description}</span>
+                  </span>
                 </span>
-              </span>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -724,7 +794,7 @@ function ProductsScreen({ category, products, onOpen }: { category: Category; pr
       <h1 className="pdn-display text-5xl">{category.name}</h1>
       <div className="mt-5 grid grid-cols-2 gap-4">
         {products.map((product) => (
-          <button key={product.id} onClick={() => onOpen(product)} className="overflow-hidden rounded-2xl border-2 border-[var(--night-950)] bg-white text-left shadow-[0_4px_0_var(--night-950)]">
+          <button key={product.id} onClick={(e) => handleInteractiveClick(e, () => onOpen(product))} className="pdn-pressable pdn-card-shadow-sm overflow-hidden rounded-2xl border-2 border-[var(--night-950)] bg-white text-left">
             <img src={product.image} alt="" className="h-40 w-full bg-[var(--paper-100)] object-contain p-2" />
             <span className="block p-4">
               <span className="flex min-h-12 items-start justify-between gap-2">
@@ -748,12 +818,25 @@ function DetailScreen(props: {
   setSelectedFormatId: (id: string) => void;
   cheesySelected: boolean;
   setCheesySelected: (selected: boolean) => void;
+  selectedExtraIngredientIds: string[];
+  setSelectedExtraIngredientIds: (ids: string[] | ((current: string[]) => string[])) => void;
   error: string | null;
   onAdd: () => void;
 }) {
   const productBase = bases.find((base) => base.id === props.product.baseId);
   const isPizza = props.product.productType === "pizza";
   const cheesyPrice = supplements[0].pricesByFormat?.[props.selectedFormatId] ?? null;
+  const selectedExtraIngredients = useMemo(
+    () => ingredients.filter((ingredient) => props.selectedExtraIngredientIds.includes(ingredient.id)),
+    [props.selectedExtraIngredientIds]
+  );
+  const extraPricing = calculateIngredientExtras(selectedExtraIngredients, 3);
+
+  function toggleExtraIngredient(ingredientId: string) {
+    props.setSelectedExtraIngredientIds((current) =>
+      current.includes(ingredientId) ? current.filter((id) => id !== ingredientId) : [...current, ingredientId]
+    );
+  }
 
   return (
     <div className="p-6">
@@ -771,9 +854,9 @@ function DetailScreen(props: {
               <button
                 key={format.id}
                 onClick={() => props.setSelectedFormatId(format.id)}
-                className={`flex items-center justify-between rounded-xl border-2 p-4 text-left ${
+                className={`pdn-pressable flex items-center justify-between rounded-xl border-2 p-4 text-left ${
                   props.selectedFormatId === format.id
-                    ? "border-[var(--night-950)] bg-[var(--gold-500)]"
+                    ? "pdn-card-shadow-sm border-[var(--night-950)] bg-[var(--gold-500)]"
                     : "border-[var(--neutral-200)] bg-white"
                 }`}
               >
@@ -786,7 +869,7 @@ function DetailScreen(props: {
             ))}
           </div>
 
-          <label className="mt-5 flex items-center justify-between rounded-xl border-2 border-[var(--night-950)] bg-white p-4">
+          <label className="pdn-card-shadow-sm mt-5 flex items-center justify-between rounded-xl border-2 border-[var(--night-950)] bg-white p-4">
             <span>
               <strong className="pdn-title block text-lg">Cheesy Crust</strong>
               <span className="text-sm">Bordure fromage fondu</span>
@@ -801,6 +884,51 @@ function DetailScreen(props: {
               />
             </span>
           </label>
+
+          <section className="pdn-card-shadow-sm mt-5 rounded-xl border-2 border-[var(--night-950)] bg-white p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="pdn-display text-3xl">Suppléments ingrédients</h2>
+                <p className="mt-1 text-sm font-extrabold text-[var(--neutral-700)]">
+                  3 ingrédients offerts, sauces gratuites, +1€ ensuite.
+                </p>
+              </div>
+              <span className="pdn-label rounded-full bg-black px-3 py-1 text-base text-white">
+                +{formatPrice(extraPricing.total)}
+              </span>
+            </div>
+            <p className="pdn-label mt-3 text-base">
+              {extraPricing.freeCount}/3 offerts · {extraPricing.paidCount} payant{extraPricing.paidCount > 1 ? "s" : ""}
+            </p>
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {ingredients.map((ingredient) => {
+                const selected = props.selectedExtraIngredientIds.includes(ingredient.id);
+                const isSauce = isSauceIngredient(ingredient);
+
+                return (
+                  <button
+                    key={ingredient.id}
+                    type="button"
+                    onClick={() => toggleExtraIngredient(ingredient.id)}
+                    className={`pdn-pressable relative min-h-28 rounded-[14px] border-2 p-2 text-center ${
+                      selected ? "pdn-card-shadow-sm border-black bg-[var(--gold-500)]" : "border-black/20 bg-[#fffdf6]"
+                    }`}
+                  >
+                    {selected ? (
+                      <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-black text-white">
+                        <Check size={14} />
+                      </span>
+                    ) : null}
+                    <span className="mx-auto grid h-14 w-14 place-items-center rounded-full border-2 border-black bg-white">
+                      <img src={ingredient.image} alt="" className="h-10 w-10 object-contain" />
+                    </span>
+                    <span className="pdn-title mt-2 block text-[10px] leading-tight">{ingredient.name}</span>
+                    {isSauce ? <span className="pdn-label mt-1 block text-xs text-[var(--red-500)]">Sauce gratuite</span> : null}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
         </>
       ) : null}
 
@@ -829,7 +957,7 @@ function CartScreen({
       {items.length === 0 ? <p className="mt-8 rounded-xl bg-white p-5 text-lg font-bold">Votre panier est vide.</p> : null}
       <div className="mt-5 space-y-4">
         {items.map((item) => (
-          <div key={item.id} className="rounded-[18px] border-[3px] border-[var(--night-950)] bg-white p-4 shadow-[5px_5px_0_var(--night-950)]">
+          <div key={item.id} className="pdn-card-shadow rounded-[18px] border-[3px] border-[var(--night-950)] bg-white p-4">
             <div className="flex gap-4">
               <img src={item.image} alt="" className="h-24 w-24 rounded-xl border-2 border-black bg-[var(--paper-100)] object-contain" />
               <div className="flex-1">
@@ -900,6 +1028,29 @@ function ItemDetails({ item, compact = false }: { item: CartItem; compact?: bool
         </div>
       ) : null}
 
+      {item.ingredientExtras && item.ingredientExtras.items.length > 0 ? (
+        <div>
+          <span className="pdn-label block text-sm text-[var(--red-500)]">Suppléments ingrédients</span>
+          <p className="mt-1 text-xs font-extrabold text-[var(--neutral-700)]">
+            {item.ingredientExtras.freeCount}/{item.ingredientExtras.freeAllowance} offerts · {item.ingredientExtras.paidCount} payant
+            {item.ingredientExtras.paidCount > 1 ? "s" : ""} · sauces gratuites · +{formatPrice(item.ingredientExtras.total)}
+          </p>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {item.ingredientExtras.items.map((ingredient) => (
+              <span
+                key={ingredient.id}
+                className={`pdn-label rounded-full border border-black px-2 py-1 text-sm ${
+                  ingredient.isSauce || ingredient.isFree ? "bg-[#fffdf6]" : "bg-[var(--gold-500)]"
+                }`}
+              >
+                {ingredient.name}
+                {ingredient.isSauce ? " (sauce)" : ingredient.isFree ? " (offert)" : ` (+${formatPrice(ingredient.unitPrice)})`}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {item.supplements.length > 0 ? (
         <p className="pdn-label rounded-lg bg-[var(--gold-500)] px-3 py-2 text-base">
           + {item.supplements.map((supplement) => supplement.name).join(", ")}
@@ -922,10 +1073,10 @@ function ReviewScreen({ items, total, error }: { items: CartItem[]; total: numbe
     <div className="p-6">
       <p className="pdn-label text-lg text-[var(--red-500)]">Ticket avant comptoir</p>
       <h1 className="pdn-display mt-1 text-5xl">Validation finale</h1>
-      <p className="pdn-title mt-3 rounded-[18px] border-[3px] border-black bg-[var(--gold-500)] p-4 text-lg shadow-[5px_5px_0_var(--night-950)]">
+      <p className="pdn-card-shadow pdn-title mt-3 rounded-[18px] border-[3px] border-black bg-[var(--gold-500)] p-4 text-lg">
         Le ticket sera imprimé. Le paiement se fait au comptoir avant préparation.
       </p>
-      <div className="mt-5 rounded-[18px] border-[3px] border-black bg-white p-5 shadow-[5px_5px_0_var(--night-950)]">
+      <div className="pdn-card-shadow mt-5 rounded-[18px] border-[3px] border-black bg-white p-5">
         {items.map((item) => (
           <div key={item.id} className="border-b border-dashed border-black/25 py-4 text-sm font-bold last:border-b-0">
             <div className="flex justify-between gap-3">

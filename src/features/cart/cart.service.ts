@@ -1,10 +1,12 @@
-import type { CartItem, SelectedSupplement } from "@/types/cart";
+import type { CartItem, IngredientExtraSummary, SelectedIngredientExtra, SelectedSupplement } from "@/types/cart";
 import type { Ingredient, PizzaBase, PizzaFormat, Product, Supplement } from "@/types/menu";
 import {
-  calculateLineTotal,
+  calculateIngredientExtras,
+  calculateSupplementsTotal,
   getFormatLabel,
   getProductUnitPrice,
-  getSupplementUnitPrice
+  getSupplementUnitPrice,
+  isSauceIngredient
 } from "@/features/pricing/pricing.service";
 
 type BuildCartItemInput = {
@@ -15,6 +17,8 @@ type BuildCartItemInput = {
   formats: PizzaFormat[];
   bases: PizzaBase[];
   supplements: Supplement[];
+  extraIngredients?: Ingredient[];
+  ingredientFreeAllowance?: number;
 };
 
 type BuildHalfHalfCartItemInput = {
@@ -27,6 +31,7 @@ type BuildHalfHalfCartItemInput = {
   formats: PizzaFormat[];
   bases: PizzaBase[];
   supplements: Supplement[];
+  extraIngredients?: Ingredient[];
 };
 
 type BuildCustomPizzaCartItemInput = {
@@ -40,13 +45,49 @@ type BuildCustomPizzaCartItemInput = {
   supplements: Supplement[];
 };
 
-export function buildCartItem(input: BuildCartItemInput): CartItem {
-  const unitPrice = getProductUnitPrice(input.product, input.formatId);
-  if (unitPrice === null) {
-    throw new Error("Le prix de ce produit est à confirmer.");
-  }
+const halfHalfFormatIds = new Set(["1-2m", "60cm"]);
 
-  const selectedSupplements: SelectedSupplement[] = (input.supplementIds ?? []).map((supplementId) => {
+function buildIngredientExtraSummary(ingredients: Ingredient[], freeAllowance: number): IngredientExtraSummary | undefined {
+  if (ingredients.length === 0) return undefined;
+
+  const pricing = calculateIngredientExtras(ingredients, freeAllowance);
+  let chargeableSeen = 0;
+  const items: SelectedIngredientExtra[] = ingredients.map((ingredient) => {
+    const isSauce = isSauceIngredient(ingredient);
+    if (isSauce) {
+      return {
+        id: ingredient.id,
+        name: ingredient.name,
+        unitPrice: 0,
+        isSauce: true,
+        isFree: true
+      };
+    }
+
+    chargeableSeen += 1;
+    const isFree = chargeableSeen <= freeAllowance;
+
+    return {
+      id: ingredient.id,
+      name: ingredient.name,
+      unitPrice: isFree ? 0 : pricing.unitPrice,
+      isSauce: false,
+      isFree
+    };
+  });
+
+  return {
+    freeAllowance: pricing.freeAllowance,
+    freeCount: pricing.freeCount,
+    paidCount: pricing.paidCount,
+    paidUnitPrice: pricing.unitPrice,
+    total: pricing.total,
+    items
+  };
+}
+
+function buildSelectedSupplements(input: { supplementIds?: string[]; supplements: Supplement[]; formatId?: string }) {
+  return (input.supplementIds ?? []).map((supplementId) => {
     const supplement = input.supplements.find((item) => item.id === supplementId);
     if (!supplement) {
       throw new Error("Supplément introuvable.");
@@ -64,10 +105,24 @@ export function buildCartItem(input: BuildCartItemInput): CartItem {
       unitPrice: supplementPrice
     };
   });
+}
 
+export function buildCartItem(input: BuildCartItemInput): CartItem {
+  const unitPrice = getProductUnitPrice(input.product, input.formatId);
+  if (unitPrice === null) {
+    throw new Error("Le prix de ce produit est à confirmer.");
+  }
+
+  const selectedSupplements: SelectedSupplement[] = buildSelectedSupplements({
+    supplementIds: input.supplementIds,
+    supplements: input.supplements,
+    formatId: input.formatId
+  });
+  const ingredientExtras = buildIngredientExtraSummary(input.extraIngredients ?? [], input.ingredientFreeAllowance ?? 3);
   const formatLabel = getFormatLabel(input.formats, input.formatId);
   const baseLabel = input.bases.find((base) => base.id === input.product.baseId)?.name;
-  const lineTotal = calculateLineTotal(unitPrice, selectedSupplements, input.quantity);
+  const lineTotal =
+    (unitPrice + calculateSupplementsTotal(selectedSupplements) + (ingredientExtras?.total ?? 0)) * input.quantity;
 
   return {
     id: `${input.product.id}-${input.formatId ?? "simple"}-${Date.now()}`,
@@ -81,7 +136,8 @@ export function buildCartItem(input: BuildCartItemInput): CartItem {
     supplements: selectedSupplements,
     quantity: input.quantity,
     unitPrice,
-    lineTotal
+    lineTotal,
+    ingredientExtras
   };
 }
 
@@ -113,8 +169,12 @@ export function buildHalfHalfCartItem(input: BuildHalfHalfCartItemInput): CartIt
     throw new Error("Sélectionnez un format et une base pour continuer.");
   }
 
+  if (!halfHalfFormatIds.has(format.id)) {
+    throw new Error("Le Moit-Moit est disponible uniquement en 1/2 mètre et 60 cm.");
+  }
+
   if (input.leftPizza.id === input.rightPizza.id) {
-    throw new Error("Choisissez deux pizzas différentes pour le Moit'-Moit'.");
+    throw new Error("Choisissez deux pizzas différentes pour le Moit-Moit.");
   }
 
   if (input.leftPizza.baseId !== input.baseId || input.rightPizza.baseId !== input.baseId) {
@@ -126,12 +186,14 @@ export function buildHalfHalfCartItem(input: BuildHalfHalfCartItemInput): CartIt
     enabled: input.cheesyCrust,
     supplements: input.supplements
   });
-  const lineTotal = calculateLineTotal(format.price, selectedSupplements, input.quantity);
+  const ingredientExtras = buildIngredientExtraSummary(input.extraIngredients ?? [], 3);
+  const lineTotal =
+    (format.price + calculateSupplementsTotal(selectedSupplements) + (ingredientExtras?.total ?? 0)) * input.quantity;
 
   return {
     id: `half-half-${input.leftPizza.id}-${input.rightPizza.id}-${input.formatId}-${Date.now()}`,
     productId: "half-half",
-    productName: "Moit'-Moit'",
+    productName: "Moit-Moit",
     productType: "halfHalf",
     image: "/image/pizza_moitie_moitie.png",
     formatId: format.id,
@@ -141,6 +203,7 @@ export function buildHalfHalfCartItem(input: BuildHalfHalfCartItemInput): CartIt
     quantity: input.quantity,
     unitPrice: format.price,
     lineTotal,
+    ingredientExtras,
     halfHalf: {
       leftPizzaId: input.leftPizza.id,
       leftPizzaName: input.leftPizza.name,
@@ -168,7 +231,9 @@ export function buildCustomPizzaCartItem(input: BuildCustomPizzaCartItemInput): 
     enabled: input.cheesyCrust,
     supplements: input.supplements
   });
-  const lineTotal = calculateLineTotal(format.price, selectedSupplements, input.quantity);
+  const ingredientExtras = buildIngredientExtraSummary(input.selectedIngredients, 6);
+  const lineTotal =
+    (format.price + calculateSupplementsTotal(selectedSupplements) + (ingredientExtras?.total ?? 0)) * input.quantity;
 
   return {
     id: `custom-pizza-${input.formatId}-${Date.now()}`,
@@ -183,6 +248,7 @@ export function buildCustomPizzaCartItem(input: BuildCustomPizzaCartItemInput): 
     quantity: input.quantity,
     unitPrice: format.price,
     lineTotal,
+    ingredientExtras,
     customPizza: {
       baseId: base.id,
       baseLabel: base.name,
@@ -197,9 +263,10 @@ export function buildCustomPizzaCartItem(input: BuildCustomPizzaCartItemInput): 
 export function updateCartItemQuantity(item: CartItem, quantity: number): CartItem {
   const nextQuantity = Math.max(1, quantity);
   const supplementTotal = item.supplements.reduce((total, supplement) => total + (supplement.unitPrice ?? 0), 0);
+  const ingredientExtraTotal = item.ingredientExtras?.total ?? 0;
   return {
     ...item,
     quantity: nextQuantity,
-    lineTotal: (item.unitPrice + supplementTotal) * nextQuantity
+    lineTotal: (item.unitPrice + supplementTotal + ingredientExtraTotal) * nextQuantity
   };
 }

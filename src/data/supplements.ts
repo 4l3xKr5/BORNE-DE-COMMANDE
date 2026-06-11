@@ -9,7 +9,7 @@ export const supplements: Supplement[] = [
       "31cm": 2,
       "40cm": 3,
       "1-2m": 4,
-      "60cm": 6
+      "60cm": 5
     },
     isAvailable: true,
     compatibleProductIds: [],

@@ -1,5 +1,5 @@
 import type { CartItem, SelectedSupplement } from "@/types/cart";
-import type { PizzaFormat, Product, Supplement } from "@/types/menu";
+import type { Ingredient, PizzaFormat, Product, Supplement } from "@/types/menu";
 
 export function getProductUnitPrice(product: Product, formatId?: string) {
   if (product.productType === "pizza") {
@@ -31,6 +31,28 @@ export function calculateSupplementsTotal(supplements: SelectedSupplement[]) {
 
 export function calculateLineTotal(unitPrice: number, supplements: SelectedSupplement[], quantity: number) {
   return (unitPrice + calculateSupplementsTotal(supplements)) * quantity;
+}
+
+export function isSauceIngredient(ingredient: Pick<Ingredient, "id">) {
+  return ingredient.id.startsWith("sauce-");
+}
+
+export function calculateIngredientExtras(
+  ingredients: Array<Pick<Ingredient, "id" | "name">>,
+  freeAllowance: number,
+  unitPrice = 1
+) {
+  const chargeableCount = ingredients.filter((ingredient) => !isSauceIngredient(ingredient)).length;
+  const freeCount = Math.min(chargeableCount, freeAllowance);
+  const paidCount = Math.max(0, chargeableCount - freeAllowance);
+
+  return {
+    freeAllowance,
+    freeCount,
+    paidCount,
+    unitPrice,
+    total: paidCount * unitPrice
+  };
 }
 
 export function calculateCartTotals(items: CartItem[]) {
