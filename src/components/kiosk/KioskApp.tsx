@@ -298,18 +298,49 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
 
       <div className="absolute top-0 left-0 h-[320px] w-[320px] rounded-full bg-red-600/[0.05] blur-[120px] pointer-events-none" />
 
-      <div className="absolute bottom-0 left-0 w-full h-44 overflow-hidden pointer-events-none z-10">
-        <svg className="w-full h-full opacity-80" viewBox="0 0 1000 100" preserveAspectRatio="none">
+      <div className="absolute inset-x-0 bottom-0 h-[27%] overflow-hidden pointer-events-none z-10">
+        <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-[#050507] via-[#050507]/66 to-transparent" />
+        <svg className="absolute inset-x-0 bottom-0 h-full w-full opacity-95" viewBox="0 0 1080 520" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="skylineFade" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#111216" stopOpacity="0.1" />
+              <stop offset="36%" stopColor="#0d0d10" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#020203" stopOpacity="1" />
+            </linearGradient>
+            <linearGradient id="distantFade" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#1b1d24" stopOpacity="0.34" />
+              <stop offset="100%" stopColor="#08090d" stopOpacity="0.92" />
+            </linearGradient>
+          </defs>
+
           <path
-            d="M0,100 L0,75 L30,75 L30,85 L60,85 L60,60 L110,60 L110,78 L150,78 L150,65 L210,65 L210,100 L260,100 L260,70 L320,70 L320,50 L380,50 L380,82 L430,82 L430,55 L500,55 L500,72 L550,72 L550,65 L610,65 L610,100 L660,100 L660,75 L730,75 L730,55 L790,55 L790,78 L840,78 L840,68 L900,68 L900,90 L950,90 L950,82 L1000,82 L1000,100 Z"
-            fill="#060609"
+            d="M0 520V318h38v-42h46v70h32V245h44v-62h16v62h28v134h52V302h38v-55h64v92h42V220h52v-76h16v76h26v166h52V286h42v-41h42v-78h14v78h44v135h46V262h56v-89h14v89h32v-34h52v112h44v-92h36v-66h14v66h42v272H0Z"
+            fill="url(#distantFade)"
           />
+
           <path
-            d="M0,100 L0,85 L40,85 L40,90 L80,90 L80,75 L140,75 L140,88 L190,88 L190,80 L250,80 L250,100 L310,100 L310,82 L360,82 L360,70 L420,70 L420,88 L470,88 L470,78 L530,78 L530,92 L590,92 L590,85 L650,85 L650,100 L710,100 L710,88 L770,88 L770,75 L830,75 L830,90 L880,90 L880,82 L930,82 L930,92 L970,92 L970,85 L1000,85 L1000,100 Z"
-            fill="#09090c"
+            d="M0 520V386h28v-58h58v-78h14v78h20v146h38V342h44v-96h18v96h36v-42h62v168h42V274h50v-88h18v88h34v-52h70v228h42V306h46v-64h16v64h34v-116h54v-82h12v82h28v306h46V350h42v-70h66v178h44V314h38v-58h48v264H0Z"
+            fill="#07070a"
           />
+
+          <path
+            d="M0 520V418h44v-52h54v-48h36v-86h12v86h30v170h52V360h64v-72h52v180h58V316h34v-52h70v-96h14v96h36v214h58V338h48v-56h28v-104h16v104h42v198h60V340h42v-44h58v190h54V372h42v-68h52v216H0Z"
+            fill="#0a0a0e"
+          />
+
+          <g opacity="0.72">
+            <path d="M76 388h11v18H76zM96 388h11v18H96zM116 388h11v18h-11zM248 372h14v12h-14zM273 372h14v12h-14zM248 404h14v12h-14zM273 404h14v12h-14zM386 324h15v11h-15zM414 324h15v11h-15zM442 324h15v11h-15zM386 360h15v11h-15zM414 360h15v11h-15zM442 360h15v11h-15zM594 348h12v16h-12zM616 348h12v16h-12zM638 348h12v16h-12zM660 348h12v16h-12zM768 300h16v14h-16zM796 300h16v14h-16zM768 334h16v14h-16zM796 334h16v14h-16zM936 360h12v18h-12zM958 360h12v18h-12zM980 360h12v18h-12z" fill="#f4c400" />
+            <path d="M146 340h11v46h-11zM164 340h11v46h-11zM690 304h13v60h-13zM714 304h13v60h-13zM1018 394h10v42h-10zM1036 394h10v42h-10z" fill="#e53424" />
+          </g>
+
+          <g opacity="0.4" stroke="#f4c400" strokeLinecap="round" strokeWidth="3">
+            <path d="M56 446h70M226 430h96M500 408h120M856 424h86" />
+          </g>
+          <path d="M0 500h1080" stroke="#101015" strokeWidth="30" />
+          <path d="M0 454h96l34 16h104l42-22h160l28 18h118l42-24h170l34 18h102l48-18h102" fill="none" stroke="#111217" strokeWidth="7" strokeLinecap="round" opacity="0.78" />
         </svg>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-transparent to-transparent opacity-90" />
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#050507] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#020203] to-transparent" />
       </div>
 
       <div className="relative flex h-full min-h-full flex-col justify-between z-20 px-8 py-16">
@@ -338,7 +369,7 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
         <div className="relative mb-20 flex flex-col items-center gap-6 w-full">
           <button
             onClick={onStart}
-            className="pdn-label animate-pulse-glow flex min-h-[88px] w-full max-w-[360px] items-center justify-center rounded-full border-2 border-[#f4c400] bg-black/75 backdrop-blur-md px-8 py-5 text-2xl text-[#f4c400] transition active:scale-95 duration-100 ease-out cursor-pointer z-20"
+            className="pdn-label animate-pulse-glow z-40 flex min-h-[88px] w-full max-w-[360px] items-center justify-center rounded-full border-2 border-[#f4c400] bg-[#050507]/90 px-8 py-5 text-2xl text-[#f4c400] shadow-[0_0_28px_rgba(244,196,0,0.28)] backdrop-blur-sm transition duration-100 ease-out active:scale-95 cursor-pointer"
           >
             Toucher pour commander
           </button>
