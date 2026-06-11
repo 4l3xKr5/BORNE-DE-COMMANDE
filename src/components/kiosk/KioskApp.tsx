@@ -56,6 +56,7 @@ export function KioskApp() {
   const totals = useMemo(() => calculateCartTotals(cartItems), [cartItems]);
   const categoryProducts = products.filter((product) => product.categoryId === selectedCategory?.id);
   const isBuilderScreen = screen === "halfHalfBuilder" || screen === "customPizzaBuilder";
+  const isCustomPizzaScreen = screen === "customPizzaBuilder";
   const showFooter = screen !== "home" && !isBuilderScreen && screen !== "confirmation";
   const showHeaderCart = screen !== "home" && screen !== "confirmation";
 
@@ -178,7 +179,11 @@ export function KioskApp() {
     <main className="kiosk-shell">
       <div className={`kiosk-frame flex h-dvh flex-col ${transitioning ? "pointer-events-none" : ""}`}>
         {screen !== "home" && (
-          <header className="no-print relative flex min-h-[112px] items-center justify-between bg-[var(--night-950)] px-7 py-5 text-white z-30">
+          <header
+            className={`no-print relative z-30 flex items-center justify-between bg-[var(--night-950)] px-7 py-5 text-white ${
+              isCustomPizzaScreen ? "min-h-[190px]" : "min-h-[132px]"
+            }`}
+          >
             <button className="pdn-label pdn-pressable flex items-center gap-2 text-xl" onClick={(e) => handleInteractiveClick(e, handleBack)}>
               <ArrowLeft size={24} />
               Retour
@@ -186,7 +191,9 @@ export function KioskApp() {
             <img
               src="/image/logo upscale.png"
               alt="Pizza de Nuit"
-              className="absolute left-1/2 -translate-x-1/2 top-[12px] h-[140px] w-[280px] object-contain z-40"
+              className={`pointer-events-none absolute left-1/2 z-40 -translate-x-1/2 object-contain animate-logo-pulse ${
+                isCustomPizzaScreen ? "top-[14px] h-[162px] w-[324px]" : "top-[8px] h-[144px] w-[288px]"
+              }`}
             />
             {showHeaderCart ? (
               <button className="pdn-pressable relative rounded-full bg-white/10 p-4" onClick={() => setScreen("cart")} aria-label="Panier">
@@ -217,7 +224,12 @@ export function KioskApp() {
             />
           ) : null}
           {!settings.maintenanceMode && screen === "products" && selectedCategory ? (
-            <ProductsScreen category={selectedCategory} products={categoryProducts} onOpen={openProduct} />
+            <ProductsScreen
+              category={selectedCategory}
+              products={categoryProducts}
+              onOpen={openProduct}
+              onSelectCategory={setSelectedCategory}
+            />
           ) : null}
           {!settings.maintenanceMode && screen === "detail" && selectedProduct ? (
             <DetailScreen
@@ -678,7 +690,10 @@ function CategoryScreen({
             </svg>
           </div>
 
-          <img src="/image/pizza_moitie_moitie.png" alt="" className="absolute bottom-[-72px] right-[-62px] h-[440px] w-[500px] object-contain animate-pizza-float-shadow z-10" />
+          <span className="pointer-events-none absolute bottom-[-72px] right-[-62px] z-10 h-[440px] w-[500px]">
+            <span className="moitmoit-pizza-ground-shadow absolute bottom-[46px] left-1/2 h-[44px] w-[330px] rounded-full bg-black/30 blur-xl" />
+            <img src="/image/pizza_moitie_moitie.png" alt="" className="moitmoit-pizza-float relative z-10 h-full w-full object-contain" />
+          </span>
           <span className="relative z-10 flex h-full min-h-[420px] max-w-[63%] flex-col justify-between p-8">
             <span className="pdn-label inline-flex w-fit rounded-full bg-black px-5 py-2 text-xl text-[var(--gold-500)] animate-best-seller">
               Best seller
@@ -735,7 +750,7 @@ function CategoryScreen({
             </span>
             <span className="flex flex-col justify-center p-6">
               <span className="pdn-label text-lg text-[var(--red-500)]">Recette sur mesure</span>
-              <span className="pdn-display mt-1 text-[2.95rem] leading-none text-[var(--gold-500)] pdn-text-shadow">Pizza personnalisée</span>
+              <span className="pdn-display pdn-custom-pizza-title-shadow mt-1 text-[2.95rem] leading-none text-[var(--gold-500)]" style={{ WebkitTextStroke: '1px rgba(0,0,0,0.80)', paintOrder: 'stroke fill' }}>Pizza personnalisée</span>
               <span className="pdn-copy mt-3 text-lg font-bold leading-snug text-[var(--neutral-700)]">
                 Laissez libre cours à votre créativité ! Choisissez votre base, ajoutez vos ingrédients préférés et créez votre pizza unique.
               </span>
@@ -788,28 +803,167 @@ function CategoryScreen({
   );
 }
 
-function ProductsScreen({ category, products, onOpen }: { category: Category; products: Product[]; onOpen: (product: Product) => void }) {
+function ProductsScreen({
+  category,
+  products,
+  onOpen,
+  onSelectCategory
+}: {
+  category: Category;
+  products: Product[];
+  onOpen: (product: Product) => void;
+  onSelectCategory: (category: Category) => void;
+}) {
+  const filterCategories = categories.filter((item) => ["pizzas-tomate", "pizzas-creme", "boissons", "desserts"].includes(item.id));
+  const isPizzaCategory = category.type === "pizza";
   return (
-    <div className="p-6">
-      <h1 className="pdn-display text-5xl">{category.name}</h1>
-      <div className="mt-5 grid grid-cols-2 gap-4">
+    <div className="min-h-full bg-[var(--night-950)] text-white">
+      <div className="sticky top-0 z-50 border-b border-white/10 bg-[rgba(5,5,5,0.92)] px-5 py-3 backdrop-blur-md">
+        <div className="grid grid-cols-4 gap-2">
+          {filterCategories.map((item) => {
+            const selected = item.id === category.id;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={(event) => handleInteractiveClick(event, () => onSelectCategory(item))}
+                className={`pdn-pressable pdn-label min-h-12 rounded-lg border px-2 py-2 text-center text-lg leading-none transition ${
+                  selected
+                    ? "border-[var(--gold-500)] bg-[var(--gold-500)] text-black shadow-[0_0_18px_rgba(244,196,0,0.32)]"
+                    : "border-white/15 bg-white/8 text-white/85"
+                }`}
+              >
+                {item.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="px-6 pb-8 pt-5">
+        <section className="flex items-end justify-between gap-5">
+          <div>
+            <p className="pdn-label text-xl text-[var(--gold-500)]">Pizza de Nuit</p>
+            <h1 className="pdn-display mt-1 text-[3.2rem] leading-none text-white">{category.name}</h1>
+          </div>
+          <p className="pdn-copy max-w-[380px] text-right text-sm font-bold leading-snug text-white/68">
+            {category.description}
+          </p>
+        </section>
+
+        <div className={`mt-5 grid ${isPizzaCategory ? "grid-cols-3 gap-4" : "grid-cols-2 gap-4"}`}>
         {products.map((product) => (
-          <button key={product.id} onClick={(e) => handleInteractiveClick(e, () => onOpen(product))} className="pdn-pressable pdn-card-shadow-sm overflow-hidden rounded-2xl border-2 border-[var(--night-950)] bg-white text-left">
-            <img src={product.image} alt="" className="h-40 w-full bg-[var(--paper-100)] object-contain p-2" />
-            <span className="block p-4">
-              <span className="flex min-h-12 items-start justify-between gap-2">
-                <strong className="pdn-title text-lg leading-tight">{product.name}</strong>
-                {product.badge ? <Badge>{product.badge}</Badge> : null}
-              </span>
-              <span className="pdn-label mt-3 block text-lg text-[var(--neutral-700)]">
-                {product.productType === "pizza" ? `À partir de ${formatPrice(formats[0].price)}` : formatPrice(product.simplePrice)}
-              </span>
-            </span>
-          </button>
+          <ProductCard key={product.id} product={product} isPortrait={isPizzaCategory} onOpen={onOpen} />
         ))}
+        </div>
       </div>
     </div>
   );
+}
+
+function ProductCard({
+  product,
+  isPortrait,
+  onOpen
+}: {
+  product: Product;
+  isPortrait: boolean;
+  onOpen: (product: Product) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(event) => handleInteractiveClick(event, () => onOpen(product))}
+      className={`pdn-pressable group overflow-hidden rounded-lg border-2 border-black bg-[var(--paper-50)] text-left text-black shadow-[0_5px_0_rgba(0,0,0,0.72)] ${
+        isPortrait ? "min-h-[374px]" : "min-h-[270px]"
+      }`}
+    >
+      <span className={`block ${isPortrait ? "p-3" : "grid h-full grid-cols-[220px_1fr] p-3"}`}>
+        <span
+          className={`relative grid place-items-center overflow-hidden rounded-md border border-black/10 bg-[linear-gradient(145deg,#fff8df,#eee3c5)] ${
+            isPortrait ? "h-[184px] w-full" : "h-full min-h-[236px]"
+          }`}
+        >
+          <span className="absolute inset-x-6 bottom-5 h-7 rounded-full bg-black/20 blur-xl" />
+          <img
+            src={product.image}
+            alt=""
+            className={`relative z-10 object-contain pdn-product-drop-shadow transition duration-200 group-active:scale-[0.98] ${
+              isPortrait ? "h-[172px] w-full p-2" : "max-h-[210px] max-w-[190px]"
+            }`}
+          />
+        </span>
+
+        <span className={`flex min-h-0 flex-col ${isPortrait ? "px-1 pb-1 pt-4" : "justify-center p-4"}`}>
+          <span className="flex min-h-[56px] items-start justify-between gap-2">
+            <strong className={`${isPortrait ? "text-[1.7rem]" : "text-[2rem]"} pdn-display leading-[0.94] text-[var(--night-950)]`}>
+              {product.name}
+            </strong>
+            {product.badge ? (
+              <span className="shrink-0 pt-0.5">
+                <Badge>{product.badge}</Badge>
+              </span>
+            ) : null}
+          </span>
+
+          <span
+            className={`pdn-copy mt-2 block overflow-hidden text-sm font-extrabold leading-snug text-[var(--neutral-700)] ${
+              isPortrait ? "min-h-[54px]" : "min-h-[42px]"
+            }`}
+            style={{ display: "-webkit-box", WebkitLineClamp: isPortrait ? 3 : 2, WebkitBoxOrient: "vertical" }}
+          >
+            {getProductCardDescription(product)}
+          </span>
+
+          <span className="mt-4 flex items-center justify-between gap-3 border-t border-black/10 pt-3">
+            <span className="pdn-label text-lg text-[var(--red-500)]">{getProductPriceLabel(product)}</span>
+            <span className="pdn-label rounded-full bg-black px-3 py-1.5 text-base text-[var(--gold-500)] shadow-[4px_4px_0_var(--gold-500)]">
+              Choisir
+            </span>
+          </span>
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function getProductPriceLabel(product: Product) {
+  if (product.productType === "pizza") {
+    return `À partir de ${formatPrice(formats[0].price)}`;
+  }
+
+  return formatPrice(product.simplePrice);
+}
+
+function getProductCardDescription(product: Product) {
+  if (product.productType !== "pizza") {
+    return product.description;
+  }
+
+  const ingredients = product.ingredientsLabel
+    .split(",")
+    .map((ingredient) => ingredient.trim())
+    .filter(Boolean);
+
+  if (ingredients.length <= 3) {
+    return `Une recette franche et gourmande autour de ${formatIngredientList(ingredients)}.`;
+  }
+
+  const signature = formatIngredientList(ingredients.slice(0, 3));
+  const finish = formatIngredientList(ingredients.slice(3, 5));
+
+  return finish ? `${signature}, avec ${finish} en touche finale.` : `Une base généreuse autour de ${signature}.`;
+}
+
+function formatIngredientList(items: string[]) {
+  const formattedItems = items.map((item) => item.charAt(0).toUpperCase() + item.slice(1));
+
+  if (formattedItems.length <= 1) {
+    return formattedItems[0] ?? "";
+  }
+
+  return `${formattedItems.slice(0, -1).join(", ")} et ${formattedItems.at(-1)}`;
 }
 
 function DetailScreen(props: {

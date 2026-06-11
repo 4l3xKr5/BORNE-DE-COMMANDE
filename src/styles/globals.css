@@ -172,14 +172,16 @@ button {
 
 .pdn-product-drop-shadow {
   filter: 
-    drop-shadow(2px 5px 4px rgba(5, 5, 5, 0.38)) 
-    drop-shadow(6px 12px 14px rgba(5, 5, 5, 0.22));
+    drop-shadow(2px 5px 4px rgba(5, 5, 5, 0.38))
+    drop-shadow(4px 10px 18px rgba(5, 5, 5, 0.28))
+    drop-shadow(6px 18px 28px rgba(5, 5, 5, 0.14));
 }
 
 .pdn-contact-shadow-dense {
   filter: 
-    drop-shadow(0 2px 1px rgba(0, 0, 0, 0.95)) 
-    drop-shadow(0 4px 3px rgba(0, 0, 0, 0.7));
+    drop-shadow(0 2px 1px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 5px 8px rgba(0, 0, 0, 0.60))
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.30));
 }
 
 @keyframes pizza-float-shadow {
@@ -373,9 +375,9 @@ button {
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.12) 35%,
-    rgba(255, 255, 255, 0.38) 50%,
-    rgba(255, 255, 255, 0.12) 65%,
+    rgba(255, 255, 255, 0.05) 36%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.05) 64%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -410,7 +412,42 @@ button {
   50% { transform: rotate(0.35deg); }
 }
 
-.animate-card-glint { animation: card-glint 11s cubic-bezier(0.25, 1, 0.5, 1) infinite; will-change: transform; }
+@keyframes moitmoit-pizza-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes moitmoit-pizza-shadow {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.32;
+    filter: blur(15px);
+  }
+  50% {
+    transform: translateX(-50%) scale(0.92);
+    opacity: 0.20;
+    filter: blur(20px);
+  }
+}
+
+.moitmoit-pizza-float {
+  animation: moitmoit-pizza-float 6.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.moitmoit-pizza-ground-shadow {
+  animation: moitmoit-pizza-shadow 6.8s ease-in-out infinite;
+  will-change: transform, opacity, filter;
+}
+
+.pdn-custom-pizza-title-shadow {
+  text-shadow:
+    0 2px 0 rgba(5, 5, 5, 0.90),
+    0 5px 8px rgba(5, 5, 5, 0.30),
+    0 10px 18px rgba(5, 5, 5, 0.18);
+}
+
+.animate-card-glint { animation: card-glint 12s cubic-bezier(0.25, 1, 0.5, 1) infinite; will-change: transform; }
 .animate-steam-rise { animation: steam-rise 4.2s ease-in-out infinite; will-change: transform, opacity; }
 .animate-star-sparkle { animation: star-sparkle 3.5s ease-in-out infinite; will-change: transform, opacity; }
 .animate-float-drift { animation: float-drift 4s ease-in-out infinite; will-change: transform; }
@@ -451,19 +488,29 @@ button {
   will-change: background-color, box-shadow;
 }
 
-/* Neon click states for category cards */
+/* Neon click states — chaque card s'illumine dans SA propre couleur de base */
+
+/* Moit-Moit : fond or #f4c400 → flash or vif */
 .pdn-neon-yellow:active,
 .pdn-neon-yellow.pdn-clicked {
-  background-color: #ffea00 !important;
-  box-shadow: 0 0 16px rgba(255, 234, 0, 0.75), 6px 4px 0 rgba(5, 5, 5, 0.8) !important;
+  background-color: #ffe000 !important;
+  box-shadow:
+    0 0 20px 6px rgba(244, 200, 0, 0.95),
+    0 0 44px 14px rgba(244, 200, 0, 0.50),
+    6px 4px 0 rgba(5, 5, 5, 0.8) !important;
 }
 
+/* Pizza personnalisée : fond crème #e7dec9 → flash crème lumineux */
 .pdn-neon-orange:active,
 .pdn-neon-orange.pdn-clicked {
-  background-color: #fffdf5 !important;
-  box-shadow: 0 0 16px rgba(255, 253, 245, 0.75), 6px 4px 0 rgba(5, 5, 5, 0.8) !important;
+  background-color: #f5efe0 !important;
+  box-shadow:
+    0 0 20px 6px rgba(231, 222, 201, 0.95),
+    0 0 44px 14px rgba(231, 222, 201, 0.55),
+    6px 4px 0 rgba(5, 5, 5, 0.8) !important;
 }
 
+/* Tomate / Crème fraîche / Boissons / Desserts : fond papier #f7f3ea → flash blanc-crème */
 .pdn-neon-red:active,
 .pdn-neon-red.pdn-clicked,
 .pdn-neon-blue:active,
@@ -472,8 +519,11 @@ button {
 .pdn-neon-green.pdn-clicked,
 .pdn-neon-pink:active,
 .pdn-neon-pink.pdn-clicked {
-  background-color: #ffffff !important;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.9), 6px 4px 0 rgba(5, 5, 5, 0.8) !important;
+  background-color: #fffef8 !important;
+  box-shadow:
+    0 0 20px 6px rgba(247, 243, 234, 0.98),
+    0 0 44px 14px rgba(247, 243, 234, 0.60),
+    6px 4px 0 rgba(5, 5, 5, 0.8) !important;
 }
 
 @keyframes phone-vibrate {
@@ -494,6 +544,18 @@ button {
   animation: phone-vibrate 5s ease-in-out infinite;
   will-change: transform;
 }
+
+/* Logo zoom in/out — respiration lente et équilibrée */
+@keyframes logo-pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50%       { transform: translateX(-50%) scale(1.025); }
+}
+
+.animate-logo-pulse {
+  animation: logo-pulse 6s ease-in-out infinite;
+  will-change: transform;
+}
+
 
 @media print {
   body * {

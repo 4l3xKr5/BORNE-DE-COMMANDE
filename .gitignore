@@ -9,3 +9,5 @@ dist
 storage/*.json
 *.log
 *.tsbuildinfo
+
+.vercel
