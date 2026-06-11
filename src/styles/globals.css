@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --night-950: #0b0b0d;
+  --night-900: #111114;
+  --night-800: #1a1a1f;
+  --paper-50: #fffdf7;
+  --paper-100: #f7f3ea;
+  --gold-400: #ffd24a;
+  --gold-500: #ffc400;
+  --gold-600: #e0a900;
+  --red-500: #e6392e;
+  --red-600: #c92f26;
+  --neutral-100: #f3f3f3;
+  --neutral-200: #e5e5e5;
+  --neutral-500: #737373;
+  --neutral-700: #404040;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--night-950);
+  color: var(--night-950);
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+.kiosk-shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 196, 0, 0.18), transparent 34rem),
+    linear-gradient(180deg, var(--night-950), var(--night-900));
+}
+
+.kiosk-frame {
+  width: min(100vw, 760px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--paper-50);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 32px 90px rgba(0, 0, 0, 0.5);
+}
+
+.scrollbar-soft::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar-soft::-webkit-scrollbar-thumb {
+  background: rgba(11, 11, 13, 0.22);
+  border-radius: 999px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 80mm;
+    padding: 0;
+    color: #000;
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
