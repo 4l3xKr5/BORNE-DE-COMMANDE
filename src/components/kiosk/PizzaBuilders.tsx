@@ -116,10 +116,10 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
         <section className="rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-black uppercase text-[var(--red-500)]">3. Choisissez les deux recettes</p>
+              <p className="pdn-label text-lg text-[var(--red-500)]">3. Choisissez les deux recettes</p>
               <p className="text-sm font-bold text-[var(--neutral-700)]">Même base : {base.name}</p>
             </div>
-            <span className="rounded-full border-2 border-black bg-[var(--gold-500)] px-3 py-1 text-xs font-black uppercase">
+            <span className="pdn-label rounded-full border-2 border-black bg-[var(--gold-500)] px-3 py-1 text-base">
               50/50 inclus
             </span>
           </div>
@@ -141,7 +141,7 @@ export function HalfHalfBuilderScreen({ onAdd }: BuilderProps) {
         </section>
 
         <CheesyCrustToggle checked={cheesyCrust} formatId={formatId} onChange={setCheesyCrust} />
-        {error ? <p className="rounded-xl bg-red-100 p-3 text-sm font-black text-[var(--red-600)]">{error}</p> : null}
+        {error ? <p className="pdn-title rounded-xl bg-red-100 p-3 text-sm text-[var(--red-600)]">{error}</p> : null}
         <BuilderTotalBar
           label="Total Moit’-Moit’"
           total={total}
@@ -225,7 +225,7 @@ export function CustomPizzaBuilderScreen({ onAdd }: BuilderProps) {
         <FormatBasePanel formatId={formatId} baseId={baseId} onFormat={setFormatId} onBase={setBaseId} />
         <IngredientPicker selectedIds={selectedIds} onToggle={toggleIngredient} maxIngredients={maxIngredients} />
         <CheesyCrustToggle checked={cheesyCrust} formatId={formatId} onChange={setCheesyCrust} />
-        {error ? <p className="rounded-xl bg-red-100 p-3 text-sm font-black text-[var(--red-600)]">{error}</p> : null}
+        {error ? <p className="pdn-title rounded-xl bg-red-100 p-3 text-sm text-[var(--red-600)]">{error}</p> : null}
         <BuilderTotalBar
           label="Total Pizza"
           total={total}
@@ -254,12 +254,12 @@ function BuilderLayout({
   return (
     <div className="min-h-full bg-[#fffdf6] pb-5">
       <section className="px-5 pb-5 pt-8 text-center">
-        <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow">
+        <span className="pdn-label inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-3 py-1 text-base shadow">
           <Sparkles size={13} className="text-[var(--gold-500)]" /> {eyebrow}
         </span>
-        <h1 className="mx-auto mt-3 max-w-xl text-5xl font-black uppercase leading-none tracking-tight">
+        <h1 className="pdn-display mx-auto mt-3 max-w-xl text-6xl">
           {title}
-          <span className="block text-[var(--gold-500)] drop-shadow-[3px_3px_0_#050505]">{highlight}</span>
+          <span className="pdn-yellow-shadow block text-[var(--gold-500)]">{highlight}</span>
         </h1>
         <p className="mx-auto mt-4 max-w-lg text-sm font-semibold text-[var(--neutral-700)]">{subtitle}</p>
         <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-[var(--gold-500)]" />
@@ -282,13 +282,13 @@ function FormatBasePanel({
 }) {
   return (
     <section className="rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
-      <p className="mb-3 text-xs font-black uppercase">1. Choisissez le format</p>
+      <p className="pdn-label mb-3 text-lg">1. Choisissez le format</p>
       <div className="grid grid-cols-2 gap-3">
         {formats.map((format) => (
           <button
             key={format.id}
             onClick={() => onFormat(format.id)}
-            className={`min-h-12 rounded-xl border-2 px-3 text-sm font-black uppercase ${
+            className={`pdn-label min-h-12 rounded-xl border-2 px-3 text-lg ${
               formatId === format.id ? "border-black bg-[var(--gold-500)]" : "border-black/20 bg-[#fffdf6]"
             }`}
           >
@@ -296,13 +296,13 @@ function FormatBasePanel({
           </button>
         ))}
       </div>
-      <p className="mb-3 mt-5 text-xs font-black uppercase">2. Choisissez la base de sauce</p>
+      <p className="pdn-label mb-3 mt-5 text-lg">2. Choisissez la base de sauce</p>
       <div className="grid grid-cols-2 gap-3">
         {bases.map((base) => (
           <button
             key={base.id}
             onClick={() => onBase(base.id)}
-            className={`min-h-12 rounded-xl border-2 px-3 text-sm font-black uppercase ${
+            className={`pdn-label min-h-12 rounded-xl border-2 px-3 text-lg ${
               baseId === base.id
                 ? "border-black bg-[var(--red-500)] text-white"
                 : "border-black/20 bg-[#fffdf6]"
@@ -349,7 +349,7 @@ function HalfHalfLivePreview({
                 className="absolute inset-0 grid place-items-center bg-[var(--gold-500)]/35"
                 style={{ clipPath: "inset(0 50% 0 0)" }}
               >
-                <span className="-translate-x-7 text-2xl font-black">A</span>
+                <span className="pdn-title -translate-x-7 text-2xl">A</span>
               </div>
             )}
             {rightPizza ? (
@@ -364,50 +364,50 @@ function HalfHalfLivePreview({
                 className="absolute inset-0 grid place-items-center bg-[var(--red-500)]/20"
                 style={{ clipPath: "inset(0 0 0 50%)" }}
               >
-                <span className="translate-x-7 text-2xl font-black">B</span>
+                <span className="pdn-title translate-x-7 text-2xl">B</span>
               </div>
             )}
             <div className="absolute left-1/2 top-[9%] h-[82%] w-[4px] -translate-x-1/2 rounded-full bg-black shadow-[0_0_0_2px_rgba(255,196,0,0.75)]" />
-            <div className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-[9px] font-black uppercase shadow-[3px_3px_0_#050505]">
+            <div className="pdn-label absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-sm shadow-[3px_3px_0_#050505]">
               50/50
             </div>
           </div>
-          <span className="absolute left-0 top-5 rotate-[-7deg] rounded border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase">
+          <span className="pdn-label absolute left-0 top-5 rotate-[-7deg] rounded border-2 border-black bg-white px-2 py-1 text-sm">
             A {leftPizza?.name ?? "à choisir"}
           </span>
-          <span className="absolute bottom-5 right-0 rotate-[7deg] rounded border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase">
+          <span className="pdn-label absolute bottom-5 right-0 rotate-[7deg] rounded border-2 border-black bg-white px-2 py-1 text-sm">
             B {rightPizza?.name ?? "à choisir"}
           </span>
         </div>
 
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-black uppercase text-[var(--red-500)]">Aperçu en direct</p>
-            <h2 className="text-2xl font-black uppercase leading-tight">
+            <p className="pdn-label text-lg text-[var(--red-500)]">Aperçu en direct</p>
+            <h2 className="pdn-title text-2xl leading-tight">
               {leftPizza?.name ?? "Moitié gauche"} / {rightPizza?.name ?? "Moitié droite"}
             </h2>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-xs font-black uppercase">
+          <div className="pdn-label grid grid-cols-2 gap-2 text-base">
             <span className="rounded-lg border-2 border-black bg-white px-2 py-2">Taille : {formatLabel}</span>
             <span className="rounded-lg border-2 border-black bg-white px-2 py-2">Base : {baseLabel}</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => onActiveHalf("left")}
-              className={`min-h-14 rounded-xl border-2 px-3 text-left text-xs font-black uppercase ${
+              className={`pdn-label min-h-14 rounded-xl border-2 px-3 text-left text-base ${
                 activeHalf === "left" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-white"
               }`}
             >
-              <span className="block text-[10px] text-[var(--red-500)]">Choisir A</span>
+              <span className="block text-sm text-[var(--red-500)]">Choisir A</span>
               {leftPizza?.name ?? "Moitié gauche"}
             </button>
             <button
               onClick={() => onActiveHalf("right")}
-              className={`min-h-14 rounded-xl border-2 px-3 text-left text-xs font-black uppercase ${
+              className={`pdn-label min-h-14 rounded-xl border-2 px-3 text-left text-base ${
                 activeHalf === "right" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-white"
               }`}
             >
-              <span className="block text-[10px] text-[var(--red-500)]">Choisir B</span>
+              <span className="block text-sm text-[var(--red-500)]">Choisir B</span>
               {rightPizza?.name ?? "Moitié droite"}
             </button>
           </div>
@@ -432,20 +432,20 @@ function HalfPickerTabs({
     <div className="mt-4 grid grid-cols-2 gap-3">
       <button
         onClick={() => onActiveHalf("left")}
-        className={`min-h-16 rounded-xl border-2 px-3 text-left font-black uppercase ${
+        className={`pdn-label min-h-16 rounded-xl border-2 px-3 text-left text-lg ${
           activeHalf === "left" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-[#fffdf6]"
         }`}
       >
-        <span className="block text-[10px] text-[var(--red-500)]">Moitié gauche (A)</span>
+        <span className="block text-sm text-[var(--red-500)]">Moitié gauche (A)</span>
         <span className="text-sm">{leftPizza?.name ?? "À choisir"}</span>
       </button>
       <button
         onClick={() => onActiveHalf("right")}
-        className={`min-h-16 rounded-xl border-2 px-3 text-left font-black uppercase ${
+        className={`pdn-label min-h-16 rounded-xl border-2 px-3 text-left text-lg ${
           activeHalf === "right" ? "border-black bg-[var(--gold-500)] shadow-[3px_3px_0_#050505]" : "border-black/20 bg-[#fffdf6]"
         }`}
       >
-        <span className="block text-[10px] text-[var(--red-500)]">Moitié droite (B)</span>
+        <span className="block text-sm text-[var(--red-500)]">Moitié droite (B)</span>
         <span className="text-sm">{rightPizza?.name ?? "À choisir"}</span>
       </button>
     </div>
@@ -489,7 +489,7 @@ function PizzaChoiceGrid({
                 <img src={pizza.image} alt="" className="h-16 w-16 object-contain" />
               </div>
               <div className="min-w-0">
-                <span className="block text-base font-black uppercase leading-tight">{pizza.name}</span>
+                <span className="pdn-title block text-base leading-tight">{pizza.name}</span>
                 <span className="mt-1 line-clamp-3 block text-[11px] font-semibold leading-tight text-[var(--neutral-700)]">
                   {pizza.ingredientsLabel}
                 </span>
@@ -498,7 +498,7 @@ function PizzaChoiceGrid({
             {selectedLeft ? <HalfBadge label="Gauche A" /> : null}
             {selectedRight ? <HalfBadge label="Droite B" /> : null}
             {unavailable ? (
-              <span className="absolute inset-x-3 bottom-3 rounded-full bg-black px-3 py-1 text-center text-[10px] font-black uppercase text-white">
+              <span className="pdn-label absolute inset-x-3 bottom-3 rounded-full bg-black px-3 py-1 text-center text-sm text-white">
                 Déjà choisie
               </span>
             ) : null}
@@ -511,7 +511,7 @@ function PizzaChoiceGrid({
 
 function HalfBadge({ label }: { label: string }) {
   return (
-    <span className="absolute right-2 top-2 rounded-full border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase">
+    <span className="pdn-label absolute right-2 top-2 rounded-full border-2 border-black bg-white px-2 py-1 text-sm">
       {label}
     </span>
   );
@@ -537,7 +537,7 @@ function CustomPizzaLivePreview({
           <div className="relative h-full w-full overflow-hidden rounded-full border-[3px] border-black bg-white drop-shadow-2xl">
             <img src="/image/photo section hero.png" alt="" className="h-full w-full scale-125 object-cover" />
             <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_45%,rgba(255,196,0,0.18)_72%)]" />
-            <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-center text-[10px] font-black uppercase leading-tight shadow-[3px_3px_0_#050505]">
+            <div className="pdn-label absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-[var(--gold-500)] text-center text-base leading-tight shadow-[3px_3px_0_#050505]">
               {selectedIngredients.length}/{maxIngredients}
             </div>
           </div>
@@ -564,23 +564,23 @@ function CustomPizzaLivePreview({
 
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-black uppercase text-[var(--red-500)]">Aperçu en direct</p>
-            <h2 className="text-2xl font-black uppercase leading-tight">Pizza personnalisée</h2>
+            <p className="pdn-label text-lg text-[var(--red-500)]">Aperçu en direct</p>
+            <h2 className="pdn-title text-2xl leading-tight">Pizza personnalisée</h2>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-xs font-black uppercase">
+          <div className="pdn-label grid grid-cols-2 gap-2 text-base">
             <span className="rounded-lg border-2 border-black bg-white px-2 py-2">Taille : {formatLabel}</span>
             <span className="rounded-lg border-2 border-black bg-white px-2 py-2">Base : {baseLabel}</span>
           </div>
           {selectedIngredients.length ? (
             <div className="flex max-h-24 flex-wrap gap-2 overflow-hidden">
               {selectedIngredients.map((ingredient) => (
-                <span key={ingredient.id} className="rounded-full border-2 border-black bg-white px-3 py-1 text-[11px] font-black uppercase">
+                <span key={ingredient.id} className="pdn-label rounded-full border-2 border-black bg-white px-3 py-1 text-sm">
                   {ingredient.name}
                 </span>
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border-2 border-dashed border-black/35 bg-white px-3 py-3 text-sm font-black uppercase text-[var(--neutral-700)]">
+            <div className="pdn-label rounded-xl border-2 border-dashed border-black/35 bg-white px-3 py-3 text-lg text-[var(--neutral-700)]">
               Touchez vos ingrédients préférés.
             </div>
           )}
@@ -603,10 +603,10 @@ function IngredientPicker({
     <section className="rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase text-[var(--red-500)]">3. Choisissez vos ingrédients</p>
+          <p className="pdn-label text-lg text-[var(--red-500)]">3. Choisissez vos ingrédients</p>
           <p className="text-sm font-bold text-[var(--neutral-700)]">Ils sont inclus tant que les prix suppléments ne sont pas confirmés.</p>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-black text-white ${selectedIds.length >= maxIngredients ? "bg-[var(--red-500)]" : "bg-black"}`}>
+        <span className={`pdn-label rounded-full px-3 py-1 text-base text-white ${selectedIds.length >= maxIngredients ? "bg-[var(--red-500)]" : "bg-black"}`}>
           {selectedIds.length}/{maxIngredients}
         </span>
       </div>
@@ -631,8 +631,8 @@ function IngredientPicker({
               <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border-2 border-black bg-white">
                 <img src={ingredient.image} alt="" className="h-12 w-12 object-contain" />
               </span>
-              <span className="mt-2 block text-[11px] font-black uppercase leading-tight">{ingredient.name}</span>
-              {limitReached ? <span className="mt-1 block text-[9px] font-black uppercase text-[var(--red-500)]">Max atteint</span> : null}
+              <span className="pdn-title mt-2 block text-[11px] leading-tight">{ingredient.name}</span>
+              {limitReached ? <span className="pdn-label mt-1 block text-sm text-[var(--red-500)]">Max atteint</span> : null}
             </button>
           );
         })}
@@ -655,7 +655,7 @@ function CheesyCrustToggle({
   return (
     <label className="flex items-center justify-between gap-4 rounded-[18px] border-[3px] border-black bg-white p-4 shadow-[5px_5px_0_#050505]">
       <span>
-        <span className="block text-sm font-black uppercase">Cheesy Crust</span>
+        <span className="pdn-title block text-sm">Cheesy Crust</span>
         <span className="text-xs font-semibold">Bordure farcie au fromage fondu (+{formatPrice(price)})</span>
       </span>
       <input
@@ -684,8 +684,8 @@ function BuilderTotalBar({
   return (
     <section className="sticky bottom-0 z-20 -mx-5 flex items-center justify-between gap-3 border-[3px] border-x-0 border-b-0 border-black bg-black p-4 text-white shadow-[0_-5px_0_var(--gold-500)]">
       <span>
-        <span className="block text-xs font-black uppercase text-[var(--gold-500)]">{label}</span>
-        <span className="block text-4xl font-black">{formatPrice(total)}</span>
+        <span className="pdn-label block text-lg text-[var(--gold-500)]">{label}</span>
+        <span className="pdn-title block text-4xl">{formatPrice(total)}</span>
         {helper ? <span className="block text-xs font-bold text-white/75">{helper}</span> : null}
       </span>
       <Button onClick={onAdd} disabled={disabled} className="min-w-48 rounded-full">

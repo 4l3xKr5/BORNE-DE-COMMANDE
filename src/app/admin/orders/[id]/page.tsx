@@ -25,8 +25,8 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
     <AdminShell pin={pin}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-widest text-[var(--red-500)]">Détail commande</p>
-          <h2 className="mt-1 text-4xl font-black uppercase">#{order.orderNumber}</h2>
+          <p className="pdn-label text-lg text-[var(--red-500)]">Détail commande</p>
+          <h2 className="pdn-display mt-1 text-4xl">#{order.orderNumber}</h2>
           <p className="mt-1 text-sm font-bold">{new Date(order.createdAt).toLocaleString("fr-FR")} · Commande à emporter</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -41,7 +41,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
           <div className="rounded-[18px] border-[3px] border-[var(--night-950)] bg-white p-5 shadow-[5px_5px_0_var(--night-950)]">
             <AdminOrderStats order={order} />
             <div className="mt-5 rounded-xl bg-black p-4 text-white">
-              <div className="flex justify-between text-2xl font-black">
+              <div className="pdn-title flex justify-between text-2xl">
                 <span>Total</span>
                 <span>{formatPrice(order.total)}</span>
               </div>
@@ -50,14 +50,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
           </div>
 
           <div className="rounded-[18px] border-[3px] border-[var(--night-950)] bg-white p-5 shadow-[5px_5px_0_var(--night-950)]">
-            <h3 className="text-2xl font-black uppercase">Contenu commande</h3>
+            <h3 className="pdn-display text-2xl">Contenu commande</h3>
             <AdminOrderItems items={order.items} />
           </div>
 
           <AdminOrderActions order={order} />
         </div>
         <div className="rounded-[18px] border-[3px] border-[var(--night-950)] bg-white p-4 shadow-[5px_5px_0_var(--night-950)]">
-          <p className="no-print mb-3 text-xs font-black uppercase tracking-widest text-[var(--red-500)]">Aperçu ticket</p>
+          <p className="pdn-label no-print mb-3 text-lg text-[var(--red-500)]">Aperçu ticket</p>
           <TicketPrintable order={order} />
         </div>
       </div>

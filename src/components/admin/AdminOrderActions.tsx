@@ -36,12 +36,12 @@ export function AdminOrderActions({ order }: { order: Order }) {
     <div className="no-print rounded-[18px] border-[3px] border-[var(--night-950)] bg-white p-5 shadow-[5px_5px_0_var(--night-950)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-widest text-[var(--red-500)]">Actions comptoir</p>
-          <h2 className="text-2xl font-black uppercase">Suivi commande</h2>
+          <p className="pdn-label text-lg text-[var(--red-500)]">Actions comptoir</p>
+          <h2 className="pdn-display text-2xl">Suivi commande</h2>
         </div>
         <button
           onClick={reprint}
-          className="inline-flex min-h-12 items-center gap-2 rounded-xl border-2 border-[var(--night-950)] bg-[var(--gold-500)] px-4 py-2 text-sm font-black uppercase shadow-[3px_3px_0_var(--night-950)]"
+          className="pdn-label inline-flex min-h-12 items-center gap-2 rounded-xl border-2 border-[var(--night-950)] bg-[var(--gold-500)] px-4 py-2 text-lg shadow-[3px_3px_0_var(--night-950)]"
         >
           <Printer size={18} /> Réimprimer ticket
         </button>
@@ -59,7 +59,7 @@ export function AdminOrderActions({ order }: { order: Order }) {
                 : "border-[var(--night-950)] bg-[var(--paper-100)] hover:bg-white"
             }`}
           >
-            <span className="block text-sm font-black uppercase">{orderStatusMeta[status].label}</span>
+            <span className="pdn-label block text-lg">{orderStatusMeta[status].label}</span>
             <span className="mt-1 block text-xs font-bold text-[var(--neutral-700)]">{orderStatusMeta[status].description}</span>
           </button>
         ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Home, Minus, Plus, Printer, ShoppingCart, Trash2 } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Printer, ShoppingCart, Trash2 } from "lucide-react";
 import { bases } from "@/data/bases";
 import { categories } from "@/data/categories";
 import { formats } from "@/data/formats";
@@ -136,25 +136,27 @@ export function KioskApp() {
   return (
     <main className="kiosk-shell">
       <div className="kiosk-frame flex h-dvh flex-col">
-        <header className="no-print flex items-center justify-between bg-[var(--night-950)] px-5 py-4 text-white">
-          <button className="flex items-center gap-2 text-sm font-bold" onClick={() => (screen === "home" ? resetSession() : setScreen("categories"))}>
-            {screen === "home" ? <Home size={22} /> : <ArrowLeft size={22} />}
-            {screen === "home" ? "Accueil" : "Retour"}
-          </button>
-          <img src="/image/LOGO PIZZA DE NUIT_.webp" alt="Pizza de Nuit" className="h-14 w-28 object-contain" />
-          {showHeaderCart ? (
-            <button className="relative rounded-full bg-white/10 p-3" onClick={() => setScreen("cart")} aria-label="Panier">
-              <ShoppingCart size={24} />
-              {cartItems.length > 0 ? (
-                <span className="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-[var(--gold-500)] text-xs font-black text-black">
-                  {cartItems.length}
-                </span>
-              ) : null}
+        {screen !== "home" && (
+          <header className="no-print flex items-center justify-between bg-[var(--night-950)] px-5 py-4 text-white">
+            <button className="pdn-label flex items-center gap-2 text-lg" onClick={() => setScreen("categories")}>
+              <ArrowLeft size={22} />
+              Retour
             </button>
-          ) : (
-            <span aria-hidden="true" className="h-12 w-12" />
-          )}
-        </header>
+            <img src="/image/LOGO PIZZA DE NUIT_.webp" alt="Pizza de Nuit" className="h-14 w-28 object-contain" />
+            {showHeaderCart ? (
+              <button className="relative rounded-full bg-white/10 p-3" onClick={() => setScreen("cart")} aria-label="Panier">
+                <ShoppingCart size={24} />
+                {cartItems.length > 0 ? (
+                  <span className="pdn-title absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-[var(--gold-500)] text-[10px] text-black">
+                    {cartItems.length}
+                  </span>
+                ) : null}
+              </button>
+            ) : (
+              <span aria-hidden="true" className="h-12 w-12" />
+            )}
+          </header>
+        )}
 
         <section className={`no-print min-h-0 flex-1 overflow-y-auto scrollbar-soft ${showFooter ? "pb-36" : "pb-0"}`}>
           {settings.maintenanceMode ? <Maintenance /> : null}
@@ -214,8 +216,8 @@ export function KioskApp() {
           <footer className="kiosk-footer no-print fixed inset-x-0 bottom-0 mx-auto border-t-2 border-[var(--night-950)] bg-white p-4 shadow-2xl">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase text-[var(--neutral-500)]">Total panier</p>
-                <p className="text-2xl font-black">{formatPrice(totals.total)}</p>
+                <p className="pdn-label text-base text-[var(--neutral-500)]">Total panier</p>
+                <p className="pdn-title text-2xl">{formatPrice(totals.total)}</p>
                 <p className="text-xs font-bold">Paiement au comptoir après impression du ticket.</p>
               </div>
               {screen === "cart" ? (
@@ -245,7 +247,7 @@ function Maintenance() {
   return (
     <div className="grid min-h-[70dvh] place-items-center p-8 text-center">
       <div>
-        <h1 className="text-4xl font-black uppercase">Borne en maintenance</h1>
+        <h1 className="pdn-display text-4xl">Borne en maintenance</h1>
         <p className="mt-4 text-lg">Merci de commander directement au comptoir.</p>
       </div>
     </div>
@@ -253,20 +255,93 @@ function Maintenance() {
 }
 
 function HomeScreen({ onStart }: { onStart: () => void }) {
+  const stars = [
+    { top: "4%", left: "12%", size: "2.5px", duration: "3.2s", delay: "0.1s" },
+    { top: "9%", left: "33%", size: "1.5px", duration: "4.5s", delay: "1.2s" },
+    { top: "6%", left: "62%", size: "3px", duration: "2.8s", delay: "0.5s" },
+    { top: "11%", left: "84%", size: "2px", duration: "3.7s", delay: "2.3s" },
+    { top: "18%", left: "18%", size: "1.5px", duration: "5.0s", delay: "0.8s" },
+    { top: "25%", left: "48%", size: "2.5px", duration: "3.4s", delay: "1.9s" },
+    { top: "16%", left: "75%", size: "2px", duration: "4.1s", delay: "0.3s" },
+    { top: "30%", left: "88%", size: "3px", duration: "2.9s", delay: "2.7s" },
+    { top: "38%", left: "14%", size: "2px", duration: "3.6s", delay: "1.5s" },
+    { top: "35%", left: "65%", size: "1.5px", duration: "4.8s", delay: "0.9s" },
+    { top: "45%", left: "85%", size: "2.5px", duration: "3.1s", delay: "2.1s" },
+    { top: "52%", left: "22%", size: "2px", duration: "4.3s", delay: "0.4s" },
+    { top: "49%", left: "50%", size: "1.5px", duration: "5.2s", delay: "1.7s" },
+    { top: "55%", left: "78%", size: "3px", duration: "2.7s", delay: "1.1s" },
+    { top: "63%", left: "10%", size: "1.5px", duration: "4.9s", delay: "2.4s" },
+    { top: "70%", left: "40%", size: "2.5px", duration: "3.3s", delay: "0.7s" },
+    { top: "66%", left: "70%", size: "2px", duration: "4.0s", delay: "1.6s" },
+    { top: "78%", left: "90%", size: "3px", duration: "2.6s", delay: "3.0s" },
+    { top: "85%", left: "25%", size: "2px", duration: "3.9s", delay: "1.3s" }
+  ];
+
   return (
-    <div className="h-full min-h-full bg-[var(--night-950)] text-white">
-      <div className="relative flex h-full min-h-full flex-col justify-between overflow-hidden p-8">
-        <img src="/image/photo section hero.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/35 to-black/90" />
-        <div className="relative pt-8">
-          <p className="text-lg font-black uppercase text-[var(--gold-500)]">Pizza de Nuit</p>
-          <h1 className="mt-3 text-6xl font-black uppercase leading-none">Commande à emporter</h1>
+    <div className="pdn-copy h-full min-h-full bg-[#050507] text-white relative overflow-hidden select-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {stars.map((star, idx) => (
+          <div
+            key={idx}
+            className="star absolute rounded-full bg-white"
+            style={{
+              top: star.top,
+              left: star.left,
+              width: star.size,
+              height: star.size,
+              animationDuration: star.duration,
+              animationDelay: star.delay
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="absolute top-0 left-0 h-[320px] w-[320px] rounded-full bg-red-600/[0.05] blur-[120px] pointer-events-none" />
+
+      <div className="absolute bottom-0 left-0 w-full h-44 overflow-hidden pointer-events-none z-10">
+        <svg className="w-full h-full opacity-80" viewBox="0 0 1000 100" preserveAspectRatio="none">
+          <path
+            d="M0,100 L0,75 L30,75 L30,85 L60,85 L60,60 L110,60 L110,78 L150,78 L150,65 L210,65 L210,100 L260,100 L260,70 L320,70 L320,50 L380,50 L380,82 L430,82 L430,55 L500,55 L500,72 L550,72 L550,65 L610,65 L610,100 L660,100 L660,75 L730,75 L730,55 L790,55 L790,78 L840,78 L840,68 L900,68 L900,90 L950,90 L950,82 L1000,82 L1000,100 Z"
+            fill="#060609"
+          />
+          <path
+            d="M0,100 L0,85 L40,85 L40,90 L80,90 L80,75 L140,75 L140,88 L190,88 L190,80 L250,80 L250,100 L310,100 L310,82 L360,82 L360,70 L420,70 L420,88 L470,88 L470,78 L530,78 L530,92 L590,92 L590,85 L650,85 L650,100 L710,100 L710,88 L770,88 L770,75 L830,75 L830,90 L880,90 L880,82 L930,82 L930,92 L970,92 L970,85 L1000,85 L1000,100 Z"
+            fill="#09090c"
+          />
+        </svg>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-transparent to-transparent opacity-90" />
+      </div>
+
+      <div className="relative flex h-full min-h-full flex-col justify-between z-20 px-8 py-16">
+        <div className="h-6" />
+
+        <div className="relative flex flex-col items-center justify-center">
+          <img
+            src="/image/LOGO PIZZA DE NUIT_.webp"
+            alt="Logo Pizza de Nuit"
+            className="h-64 w-64 object-contain z-10 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] animate-[float_4s_ease-in-out_infinite]"
+          />
+
+
+          <div className="mt-8 text-center max-w-lg">
+            <h1 className="pdn-display text-[5.5rem] text-[#f4c400] filter drop-shadow-[0_0_8px_rgba(244,196,0,0.4)]">
+              LA STREET PIZZA <br/>
+              <span className="text-white text-[4.5rem] filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">DE LA NUIT</span>
+            </h1>
+            <p className="pdn-label mt-6 text-xl text-white/70 leading-relaxed max-w-sm mx-auto">
+              Formats XXL • Option Moit/Moit <br/>
+              <span className="text-[#f4c400]">Ouvert 7J/7 jusqu'à 4h</span>
+            </p>
+          </div>
         </div>
-        <div className="relative space-y-4">
-          <p className="text-xl font-bold">Composez votre commande, imprimez le ticket, puis réglez au comptoir.</p>
-          <Button onClick={onStart} className="w-full text-xl">
-            Commander à emporter
-          </Button>
+
+        <div className="relative mb-20 flex flex-col items-center gap-6 w-full">
+          <button
+            onClick={onStart}
+            className="pdn-label animate-pulse-glow flex min-h-[88px] w-full max-w-[360px] items-center justify-center rounded-full border-2 border-[#f4c400] bg-black/75 backdrop-blur-md px-8 py-5 text-2xl text-[#f4c400] transition active:scale-95 duration-100 ease-out cursor-pointer z-20"
+          >
+            Toucher pour commander
+          </button>
         </div>
       </div>
     </div>
@@ -284,7 +359,7 @@ function CategoryScreen({
 }) {
   return (
     <div className="p-6">
-      <h1 className="text-4xl font-black uppercase">Choisis ta catégorie</h1>
+      <h1 className="pdn-display text-5xl">Choisis ta catégorie</h1>
       <div className="mt-6 grid gap-5">
         <button
           onClick={onHalfHalf}
@@ -292,8 +367,8 @@ function CategoryScreen({
         >
           <img src="/image/pizza_moitie_moitie.png" alt="" className="h-36 w-full object-cover" />
           <span className="flex flex-col justify-center p-5">
-            <span className="text-3xl font-black uppercase">Moit’-Moit’</span>
-            <span className="mt-2 text-sm font-bold text-[var(--night-950)]">Deux recettes sur une même base, option 50/50 incluse.</span>
+            <span className="pdn-title text-3xl">Moit’-Moit’</span>
+            <span className="pdn-copy mt-2 text-sm font-bold text-[var(--night-950)]">Deux recettes sur une même base, option 50/50 incluse.</span>
           </span>
         </button>
         <button
@@ -302,8 +377,8 @@ function CategoryScreen({
         >
           <img src="/image/ingredients/mozzarella.webp" alt="" className="h-36 w-full bg-[var(--paper-100)] object-contain p-4" />
           <span className="flex flex-col justify-center p-5">
-            <span className="text-3xl font-black uppercase">Pizza personnalisée</span>
-            <span className="mt-2 text-sm font-bold text-[var(--neutral-700)]">Choisissez votre base, format et ingrédients.</span>
+            <span className="pdn-title text-3xl">Pizza personnalisée</span>
+            <span className="pdn-copy mt-2 text-sm font-bold text-[var(--neutral-700)]">Choisissez votre base, format et ingrédients.</span>
           </span>
         </button>
         {categories.map((category) => (
@@ -314,8 +389,8 @@ function CategoryScreen({
           >
             <img src={category.image} alt="" className="h-36 w-full object-cover" />
             <span className="flex flex-col justify-center p-5">
-              <span className="text-3xl font-black uppercase">{category.name}</span>
-              <span className="mt-2 text-sm font-bold text-[var(--neutral-700)]">{category.description}</span>
+              <span className="pdn-title text-3xl">{category.name}</span>
+              <span className="pdn-copy mt-2 text-sm font-bold text-[var(--neutral-700)]">{category.description}</span>
             </span>
           </button>
         ))}
@@ -327,17 +402,17 @@ function CategoryScreen({
 function ProductsScreen({ category, products, onOpen }: { category: Category; products: Product[]; onOpen: (product: Product) => void }) {
   return (
     <div className="p-6">
-      <h1 className="text-4xl font-black uppercase">{category.name}</h1>
+      <h1 className="pdn-display text-5xl">{category.name}</h1>
       <div className="mt-5 grid grid-cols-2 gap-4">
         {products.map((product) => (
           <button key={product.id} onClick={() => onOpen(product)} className="overflow-hidden rounded-2xl border-2 border-[var(--night-950)] bg-white text-left shadow-[0_4px_0_var(--night-950)]">
             <img src={product.image} alt="" className="h-40 w-full bg-[var(--paper-100)] object-contain p-2" />
             <span className="block p-4">
               <span className="flex min-h-12 items-start justify-between gap-2">
-                <strong className="text-lg uppercase leading-tight">{product.name}</strong>
+                <strong className="pdn-title text-lg leading-tight">{product.name}</strong>
                 {product.badge ? <Badge>{product.badge}</Badge> : null}
               </span>
-              <span className="mt-3 block text-sm font-bold text-[var(--neutral-700)]">
+              <span className="pdn-label mt-3 block text-lg text-[var(--neutral-700)]">
                 {product.productType === "pizza" ? `À partir de ${formatPrice(formats[0].price)}` : formatPrice(product.simplePrice)}
               </span>
             </span>
@@ -364,14 +439,14 @@ function DetailScreen(props: {
   return (
     <div className="p-6">
       <img src={props.product.image} alt="" className="h-72 w-full rounded-2xl bg-white object-contain p-4 shadow" />
-      <h1 className="mt-5 text-4xl font-black uppercase">{props.product.name}</h1>
+      <h1 className="pdn-display mt-5 text-5xl">{props.product.name}</h1>
       {props.product.badge ? <div className="mt-2"><Badge>{props.product.badge}</Badge></div> : null}
-      <p className="mt-3 text-base font-bold">Base : {productBase?.name ?? "Information à confirmer."}</p>
+      <p className="pdn-copy mt-3 text-base font-bold">Base : {productBase?.name ?? "Information à confirmer."}</p>
       <p className="mt-1 text-sm text-[var(--neutral-700)]">Ingrédients : {props.product.ingredientsLabel}</p>
 
       {isPizza ? (
         <>
-          <h2 className="mt-6 text-2xl font-black uppercase">Format</h2>
+          <h2 className="pdn-display mt-6 text-3xl">Format</h2>
           <div className="mt-3 grid gap-3">
             {formats.map((format) => (
               <button
@@ -384,17 +459,17 @@ function DetailScreen(props: {
                 }`}
               >
                 <span>
-                  <strong className="block text-xl">{format.label}</strong>
+                  <strong className="pdn-title block text-xl">{format.label}</strong>
                   <span className="text-sm">{format.description}</span>
                 </span>
-                <strong className="text-2xl">{formatPrice(format.price)}</strong>
+                <strong className="pdn-title text-2xl">{formatPrice(format.price)}</strong>
               </button>
             ))}
           </div>
 
           <label className="mt-5 flex items-center justify-between rounded-xl border-2 border-[var(--night-950)] bg-white p-4">
             <span>
-              <strong className="block text-lg">Cheesy Crust</strong>
+              <strong className="pdn-title block text-lg">Cheesy Crust</strong>
               <span className="text-sm">Bordure fromage fondu</span>
             </span>
             <span className="flex items-center gap-4">
@@ -429,8 +504,8 @@ function CartScreen({
 }) {
   return (
     <div className="p-6">
-      <p className="text-xs font-black uppercase tracking-widest text-[var(--red-500)]">Dernière vérification</p>
-      <h1 className="mt-1 text-4xl font-black uppercase">Panier</h1>
+      <p className="pdn-label text-lg text-[var(--red-500)]">Dernière vérification</p>
+      <h1 className="pdn-display mt-1 text-5xl">Panier</h1>
       <p className="mt-2 text-sm font-bold text-[var(--neutral-700)]">Contrôlez les formats, bases et options avant impression du ticket.</p>
       {items.length === 0 ? <p className="mt-8 rounded-xl bg-white p-5 text-lg font-bold">Votre panier est vide.</p> : null}
       <div className="mt-5 space-y-4">
@@ -441,10 +516,10 @@ function CartScreen({
               <div className="flex-1">
                 <div className="flex justify-between gap-3">
                   <div>
-                    <strong className="text-xl uppercase">{item.productName}</strong>
-                    <p className="text-xs font-black uppercase text-[var(--neutral-500)]">Quantité : {item.quantity}</p>
+                    <strong className="pdn-title text-xl">{item.productName}</strong>
+                    <p className="pdn-label text-base text-[var(--neutral-500)]">Quantité : {item.quantity}</p>
                   </div>
-                  <strong className="text-xl">{formatPrice(item.lineTotal)}</strong>
+                  <strong className="pdn-title text-xl">{formatPrice(item.lineTotal)}</strong>
                 </div>
                 <ItemDetails item={item} />
                 <div className="mt-3 flex items-center justify-between">
@@ -452,7 +527,7 @@ function CartScreen({
                     <Button variant="secondary" className="min-h-11 px-3 py-2" onClick={() => onQuantity(item.id, -1)}>
                       <Minus size={18} />
                     </Button>
-                    <span className="w-10 text-center text-xl font-black">{item.quantity}</span>
+                    <span className="pdn-title w-10 text-center text-xl">{item.quantity}</span>
                     <Button variant="secondary" className="min-h-11 px-3 py-2" onClick={() => onQuantity(item.id, 1)}>
                       <Plus size={18} />
                     </Button>
@@ -483,22 +558,22 @@ function ItemDetails({ item, compact = false }: { item: CartItem; compact?: bool
       {item.halfHalf ? (
         <div className="grid grid-cols-2 gap-2 rounded-xl border-2 border-black bg-[#fffdf6] p-2">
           <div className="rounded-lg bg-white p-2">
-            <span className="block text-[10px] font-black uppercase text-[var(--red-500)]">Moitié A</span>
-            <strong className="text-sm uppercase">{item.halfHalf.leftPizzaName}</strong>
+            <span className="pdn-label block text-sm text-[var(--red-500)]">Moitié A</span>
+            <strong className="pdn-title text-sm">{item.halfHalf.leftPizzaName}</strong>
           </div>
           <div className="rounded-lg bg-white p-2">
-            <span className="block text-[10px] font-black uppercase text-[var(--red-500)]">Moitié B</span>
-            <strong className="text-sm uppercase">{item.halfHalf.rightPizzaName}</strong>
+            <span className="pdn-label block text-sm text-[var(--red-500)]">Moitié B</span>
+            <strong className="pdn-title text-sm">{item.halfHalf.rightPizzaName}</strong>
           </div>
         </div>
       ) : null}
 
       {item.customPizza ? (
         <div>
-          <span className="block text-[10px] font-black uppercase text-[var(--red-500)]">Ingrédients sélectionnés</span>
+          <span className="pdn-label block text-sm text-[var(--red-500)]">Ingrédients sélectionnés</span>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {item.customPizza.ingredients.map((ingredient) => (
-              <span key={ingredient.id} className="rounded-full border border-black bg-[#fffdf6] px-2 py-1 text-[11px] font-black uppercase">
+              <span key={ingredient.id} className="pdn-label rounded-full border border-black bg-[#fffdf6] px-2 py-1 text-sm">
                 {ingredient.name}
               </span>
             ))}
@@ -507,7 +582,7 @@ function ItemDetails({ item, compact = false }: { item: CartItem; compact?: bool
       ) : null}
 
       {item.supplements.length > 0 ? (
-        <p className="rounded-lg bg-[var(--gold-500)] px-3 py-2 text-xs font-black uppercase">
+        <p className="pdn-label rounded-lg bg-[var(--gold-500)] px-3 py-2 text-base">
           + {item.supplements.map((supplement) => supplement.name).join(", ")}
         </p>
       ) : null}
@@ -517,7 +592,7 @@ function ItemDetails({ item, compact = false }: { item: CartItem; compact?: bool
 
 function DetailPill({ label, value }: { label: string; value: string }) {
   return (
-    <span className="rounded-full border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase">
+    <span className="pdn-label rounded-full border-2 border-black bg-white px-3 py-1 text-base">
       {label} : {value}
     </span>
   );
@@ -526,28 +601,28 @@ function DetailPill({ label, value }: { label: string; value: string }) {
 function ReviewScreen({ items, total, error }: { items: CartItem[]; total: number; error: string | null }) {
   return (
     <div className="p-6">
-      <p className="text-xs font-black uppercase tracking-widest text-[var(--red-500)]">Ticket avant comptoir</p>
-      <h1 className="mt-1 text-4xl font-black uppercase">Validation finale</h1>
-      <p className="mt-3 rounded-[18px] border-[3px] border-black bg-[var(--gold-500)] p-4 text-lg font-black shadow-[5px_5px_0_var(--night-950)]">
+      <p className="pdn-label text-lg text-[var(--red-500)]">Ticket avant comptoir</p>
+      <h1 className="pdn-display mt-1 text-5xl">Validation finale</h1>
+      <p className="pdn-title mt-3 rounded-[18px] border-[3px] border-black bg-[var(--gold-500)] p-4 text-lg shadow-[5px_5px_0_var(--night-950)]">
         Le ticket sera imprimé. Le paiement se fait au comptoir avant préparation.
       </p>
       <div className="mt-5 rounded-[18px] border-[3px] border-black bg-white p-5 shadow-[5px_5px_0_var(--night-950)]">
         {items.map((item) => (
           <div key={item.id} className="border-b border-dashed border-black/25 py-4 text-sm font-bold last:border-b-0">
             <div className="flex justify-between gap-3">
-              <span className="text-base uppercase">{item.quantity} x {item.productName}</span>
+              <span className="pdn-title text-base">{item.quantity} x {item.productName}</span>
               <span>{formatPrice(item.lineTotal)}</span>
             </div>
             <ItemDetails item={item} compact />
           </div>
         ))}
-        <div className="mt-5 flex justify-between rounded-xl bg-black p-4 text-2xl font-black text-white">
+        <div className="pdn-title mt-5 flex justify-between rounded-xl bg-black p-4 text-2xl text-white">
           <span>Total</span>
           <span>{formatPrice(total)}</span>
         </div>
       </div>
       {error ? <p className="mt-4 rounded-xl bg-red-100 p-3 font-bold text-[var(--red-600)]">{error}</p> : null}
-      <p className="mt-5 rounded-xl bg-white p-4 text-center text-sm font-black uppercase shadow">
+      <p className="pdn-label mt-5 rounded-xl bg-white p-4 text-center text-lg shadow">
         Vérifiez le résumé, puis validez avec le bouton en bas de l'écran.
       </p>
     </div>
@@ -558,9 +633,9 @@ function ConfirmationScreen({ order }: { order: Order }) {
   return (
     <div className="grid min-h-[calc(100dvh-96px)] place-items-center bg-[var(--night-950)] p-8 text-center text-white">
       <div>
-        <p className="text-lg font-black uppercase text-[var(--gold-500)]">Ticket imprimé</p>
-        <h1 className="mt-3 text-6xl font-black uppercase">#{order.orderNumber}</h1>
-        <p className="mt-6 text-3xl font-black">Présentez votre ticket au comptoir pour régler votre commande.</p>
+        <p className="pdn-label text-2xl text-[var(--gold-500)]">Ticket imprimé</p>
+        <h1 className="pdn-display mt-3 text-7xl">#{order.orderNumber}</h1>
+        <p className="pdn-title mt-6 text-3xl">Présentez votre ticket au comptoir pour régler votre commande.</p>
         <p className="mt-4 rounded-full border border-white/20 bg-white/10 px-5 py-3 text-base font-bold">
           Préparation à emporter après paiement comptoir.
         </p>

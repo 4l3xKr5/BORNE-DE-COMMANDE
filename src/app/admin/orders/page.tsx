@@ -23,8 +23,8 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
     <AdminShell pin={pin}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-widest text-[var(--red-500)]">Suivi comptoir</p>
-          <h2 className="mt-1 text-4xl font-black uppercase">Commandes</h2>
+          <p className="pdn-label text-lg text-[var(--red-500)]">Suivi comptoir</p>
+          <h2 className="pdn-display mt-1 text-4xl">Commandes</h2>
         </div>
         <div className="grid grid-cols-3 gap-2">
           <AdminCounter label="Actives" value={activeOrders} />
@@ -48,7 +48,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                 <StatusPill type="order" status={order.orderStatus} />
                 <StatusPill type="payment" status={order.paymentStatus} />
               </span>
-              <span className="mt-2 block text-xs font-black uppercase text-[var(--neutral-500)]">
+              <span className="pdn-label mt-2 block text-base text-[var(--neutral-500)]">
                 {order.items.length} ligne{order.items.length > 1 ? "s" : ""} · {order.items.reduce((sum, item) => sum + item.quantity, 0)} produit{order.items.reduce((sum, item) => sum + item.quantity, 0) > 1 ? "s" : ""}
               </span>
             </span>
@@ -63,7 +63,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
 function AdminCounter({ label, value }: { label: string; value: number }) {
   return (
     <div className="min-w-24 rounded-xl border-2 border-black bg-white px-4 py-2 text-center shadow-[3px_3px_0_var(--night-950)]">
-      <span className="block text-[10px] font-black uppercase text-[var(--neutral-500)]">{label}</span>
+      <span className="pdn-label block text-sm text-[var(--neutral-500)]">{label}</span>
       <strong className="text-2xl">{value}</strong>
     </div>
   );

@@ -19,7 +19,7 @@ export function Button({ className, variant = "primary", children, ...props }: B
   return (
     <button
       className={cn(
-        "min-h-14 rounded-xl border-2 px-5 py-3 text-base font-black uppercase tracking-wide transition active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-45",
+        "pdn-label min-h-14 rounded-xl border-2 px-5 py-3 text-xl transition active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-45",
         variants[variant],
         className
       )}

@@ -14,11 +14,11 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
   return (
     <AdminShell pin={pin}>
-      <h2 className="text-4xl font-black uppercase">Produits</h2>
+      <h2 className="pdn-display text-4xl">Produits</h2>
       <div className="mt-6 grid gap-3 md:grid-cols-2">
         {products.map((product) => (
           <div key={product.id} className="rounded-xl border-2 border-[var(--night-950)] bg-white p-4">
-            <strong className="block text-lg uppercase">{product.name}</strong>
+            <strong className="pdn-title block text-lg">{product.name}</strong>
             <span className="text-sm font-bold">{product.productType}</span>
             <p className="mt-2 text-sm">Disponible : {product.isAvailable ? "oui" : "non"}</p>
             <p className="text-sm">

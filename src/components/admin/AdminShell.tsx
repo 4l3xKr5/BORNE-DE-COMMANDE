@@ -9,10 +9,10 @@ export function AdminShell({ pin, children }: { pin: string; children: ReactNode
       <header className="border-b-2 border-[var(--night-950)] bg-white px-6 py-5">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div>
-            <p className="text-xs font-black uppercase text-[var(--red-500)]">Admin simple</p>
-            <h1 className="text-3xl font-black uppercase">Pizza de Nuit</h1>
+            <p className="pdn-label text-lg text-[var(--red-500)]">Admin simple</p>
+            <h1 className="pdn-display text-3xl">Pizza de Nuit</h1>
           </div>
-          <nav className="flex gap-3 text-sm font-black uppercase">
+          <nav className="pdn-label flex gap-3 text-lg">
             <Link href={`/admin/orders${suffix}`}>Commandes</Link>
             <Link href={`/admin/products${suffix}`}>Produits</Link>
             <Link href={`/admin/settings${suffix}`}>Settings</Link>

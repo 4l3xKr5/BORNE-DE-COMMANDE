@@ -1,16 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Lilita+One&display=swap");
 @import "tailwindcss";
 
 :root {
   --kiosk-max-width: 1080px;
-  --night-950: #0b0b0d;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Lilita One", "Archivo Black", system-ui, sans-serif;
+  --font-title: "Archivo Black", "Inter", system-ui, sans-serif;
+  --font-label: "Bebas Neue", "Inter", system-ui, sans-serif;
+  --night-950: #050505;
   --night-900: #111114;
   --night-800: #1a1a1f;
   --paper-50: #fffdf7;
   --paper-100: #f7f3ea;
   --gold-400: #ffd24a;
-  --gold-500: #ffc400;
+  --gold-500: #f4c400;
   --gold-600: #e0a900;
-  --red-500: #e6392e;
+  --red-500: #e53424;
   --red-600: #c92f26;
   --neutral-100: #f3f3f3;
   --neutral-200: #e5e5e5;
@@ -31,18 +36,108 @@ body {
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "liga" 1, "kern" 1;
+  text-rendering: geometricPrecision;
 }
 
 button,
 input,
 select,
 textarea {
-  font: inherit;
+  font-family: inherit;
 }
 
 button {
   touch-action: manipulation;
+}
+
+.pdn-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.pdn-title {
+  font-family: var(--font-title);
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.pdn-label {
+  font-family: var(--font-label);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.pdn-copy {
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+}
+
+.pdn-yellow-shadow {
+  text-shadow: 3px 3px 0 var(--night-950);
+}
+
+.pdn-sticker-shadow {
+  box-shadow: 5px 5px 0 var(--night-950);
+}
+
+.font-sans,
+.font-inter {
+  font-family: var(--font-sans);
+}
+
+.font-bebas {
+  font-family: var(--font-label);
+}
+
+@keyframes sky-twinkle {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(0.75);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(244, 196, 0, 0.4), inset 0 0 5px rgba(244, 196, 0, 0.2);
+    border-color: rgba(244, 196, 0, 0.8);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 32px rgba(244, 196, 0, 0.8), inset 0 0 15px rgba(244, 196, 0, 0.4);
+    border-color: rgba(244, 196, 0, 1);
+    transform: scale(1.025);
+  }
+}
+
+.star {
+  animation: sky-twinkle ease-in-out infinite alternate;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s infinite ease-in-out;
 }
 
 .kiosk-shell {

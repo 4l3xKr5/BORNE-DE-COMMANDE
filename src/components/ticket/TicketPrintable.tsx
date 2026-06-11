@@ -6,9 +6,9 @@ export function TicketPrintable({ order }: { order: Order }) {
   return (
     <div className="print-area mx-auto w-full max-w-sm rounded-xl bg-white p-5 text-black shadow-lg">
       <div className="text-center">
-        <strong className="text-xl uppercase">{settings.restaurantName}</strong>
-        <p className="mt-1 text-sm font-bold uppercase">Commande à emporter</p>
-        <p className="mt-2 text-3xl font-black">#{order.orderNumber}</p>
+        <strong className="pdn-title text-xl">{settings.restaurantName}</strong>
+        <p className="pdn-label mt-1 text-base">Commande à emporter</p>
+        <p className="pdn-title mt-2 text-3xl">#{order.orderNumber}</p>
         <p className="text-xs">{new Date(order.createdAt).toLocaleString("fr-FR")}</p>
       </div>
 
@@ -48,11 +48,11 @@ export function TicketPrintable({ order }: { order: Order }) {
         ))}
       </div>
 
-      <div className="flex justify-between border-b-2 border-black pb-2 text-lg font-black">
+      <div className="pdn-title flex justify-between border-b-2 border-black pb-2 text-lg">
         <span>Total</span>
         <span>{formatPrice(order.total)}</span>
       </div>
-      <div className="mt-4 rounded-lg border-2 border-black p-3 text-center text-sm font-black uppercase">
+      <div className="pdn-label mt-4 rounded-lg border-2 border-black p-3 text-center text-base">
         Paiement au comptoir avant préparation
       </div>
       <p className="mt-3 text-center text-sm">{settings.ticketMessage}</p>

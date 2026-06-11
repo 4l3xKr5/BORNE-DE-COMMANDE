@@ -13,7 +13,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
 
   return (
     <AdminShell pin={pin}>
-      <h2 className="text-4xl font-black uppercase">Settings</h2>
+      <h2 className="pdn-display text-4xl">Settings</h2>
       <pre className="mt-6 overflow-auto rounded-2xl border-2 border-[var(--night-950)] bg-white p-5 text-sm">
         {JSON.stringify(settings, null, 2)}
       </pre>

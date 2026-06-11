@@ -18,7 +18,7 @@ export function StatusPill({
   const meta = type === "order" ? orderStatusMeta[status] : type === "payment" ? paymentStatusMeta[status] : printStatusMeta[status];
 
   return (
-    <span className={`inline-flex rounded-full border-2 px-3 py-1 text-xs font-black uppercase ${getToneClasses(meta.tone)}`}>
+    <span className={`pdn-label inline-flex rounded-full border-2 px-3 py-1 text-base ${getToneClasses(meta.tone)}`}>
       {meta.label}
     </span>
   );
@@ -38,8 +38,8 @@ export function AdminOrderStats({ order }: { order: Order }) {
 function AdminStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border-2 border-black bg-[#fffdf6] p-3">
-      <span className="block text-[10px] font-black uppercase text-[var(--neutral-500)]">{label}</span>
-      <strong className="text-lg uppercase">{value}</strong>
+      <span className="pdn-label block text-sm text-[var(--neutral-500)]">{label}</span>
+      <strong className="pdn-title text-lg">{value}</strong>
     </div>
   );
 }
@@ -59,7 +59,7 @@ export function AdminOrderItem({ item }: { item: OrderItem }) {
     <div className="py-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <strong className="text-lg uppercase">{item.quantity} x {item.productName}</strong>
+          <strong className="pdn-title text-lg">{item.quantity} x {item.productName}</strong>
           <div className="mt-2 flex flex-wrap gap-2">
             {item.formatLabel ? <AdminDetailPill label="Format" value={item.formatLabel} /> : null}
             {item.baseLabel ? <AdminDetailPill label="Base" value={item.baseLabel} /> : null}
@@ -71,22 +71,22 @@ export function AdminOrderItem({ item }: { item: OrderItem }) {
       {item.halfHalf ? (
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <div className="rounded-xl border-2 border-black bg-white p-3">
-            <span className="block text-[10px] font-black uppercase text-[var(--red-500)]">Moitié A</span>
-            <strong className="uppercase">{item.halfHalf.leftPizzaName}</strong>
+            <span className="pdn-label block text-sm text-[var(--red-500)]">Moitié A</span>
+            <strong className="pdn-title">{item.halfHalf.leftPizzaName}</strong>
           </div>
           <div className="rounded-xl border-2 border-black bg-white p-3">
-            <span className="block text-[10px] font-black uppercase text-[var(--red-500)]">Moitié B</span>
-            <strong className="uppercase">{item.halfHalf.rightPizzaName}</strong>
+            <span className="pdn-label block text-sm text-[var(--red-500)]">Moitié B</span>
+            <strong className="pdn-title">{item.halfHalf.rightPizzaName}</strong>
           </div>
         </div>
       ) : null}
 
       {item.customPizza ? (
         <div className="mt-3">
-          <span className="block text-[10px] font-black uppercase text-[var(--red-500)]">Ingrédients</span>
+          <span className="pdn-label block text-sm text-[var(--red-500)]">Ingrédients</span>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {item.customPizza.ingredients.map((ingredient) => (
-              <span key={ingredient.id} className="rounded-full border border-black bg-white px-2 py-1 text-[11px] font-black uppercase">
+              <span key={ingredient.id} className="pdn-label rounded-full border border-black bg-white px-2 py-1 text-sm">
                 {ingredient.name}
               </span>
             ))}
@@ -95,7 +95,7 @@ export function AdminOrderItem({ item }: { item: OrderItem }) {
       ) : null}
 
       {item.supplements.length > 0 ? (
-        <p className="mt-3 rounded-lg bg-[var(--gold-500)] px-3 py-2 text-xs font-black uppercase">
+        <p className="pdn-label mt-3 rounded-lg bg-[var(--gold-500)] px-3 py-2 text-base">
           Suppléments : {item.supplements.map((supplement) => supplement.name).join(", ")}
         </p>
       ) : null}
@@ -105,7 +105,7 @@ export function AdminOrderItem({ item }: { item: OrderItem }) {
 
 function AdminDetailPill({ label, value }: { label: string; value: string }) {
   return (
-    <span className="rounded-full border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase">
+    <span className="pdn-label rounded-full border-2 border-black bg-white px-3 py-1 text-base">
       {label} : {value}
     </span>
   );
