@@ -616,43 +616,103 @@ function CategoryScreen({
   onHalfHalf: () => void;
   onCustomPizza: () => void;
 }) {
+  const pizzaCategories = categories.filter((category) => category.type === "pizza");
+  const sideCategories = categories.filter((category) => category.type !== "pizza");
+
   return (
-    <div className="p-6">
-      <h1 className="pdn-display text-5xl">Choisis ta catégorie</h1>
-      <div className="mt-6 grid gap-5">
+    <div className="flex h-[calc(100dvh-14rem)] min-h-[1180px] flex-col bg-[#fffdf6] p-5">
+      <section className="flex items-end justify-between gap-4">
+        <div>
+          <p className="pdn-label text-xl text-[var(--red-500)]">Commande borne</p>
+          <h1 className="pdn-display mt-1 text-[3.45rem] leading-none">Choisis ta catégorie</h1>
+        </div>
+        <div className="pdn-label shrink-0 rounded-full border-2 border-black bg-white px-4 py-2 text-lg shadow-[3px_3px_0_#050505]">
+          À emporter
+        </div>
+      </section>
+
+      <div className="mt-5 grid min-h-0 flex-1 grid-rows-[1.35fr_0.68fr_0.62fr_0.58fr] gap-5">
         <button
           onClick={onHalfHalf}
-          className="grid grid-cols-[160px_1fr] overflow-hidden rounded-2xl border-[3px] border-[var(--night-950)] bg-[var(--gold-500)] text-left shadow-[0_6px_0_var(--night-950)]"
+          className="relative h-full min-h-[420px] overflow-hidden rounded-[30px] border-[4px] border-black bg-[var(--gold-500)] text-left shadow-[0_10px_0_#050505] transition active:translate-y-1 active:shadow-[0_5px_0_#050505]"
         >
-          <img src="/image/pizza_moitie_moitie.png" alt="" className="h-36 w-full object-cover" />
-          <span className="flex flex-col justify-center p-5">
-            <span className="pdn-title text-3xl">Moit’-Moit’</span>
-            <span className="pdn-copy mt-2 text-sm font-bold text-[var(--night-950)]">Deux recettes sur une même base, option 50/50 incluse.</span>
+          <img src="/image/pizza_moitie_moitie.png" alt="" className="absolute bottom-[-72px] right-[-62px] h-[440px] w-[500px] object-contain drop-shadow-[0_18px_20px_rgba(0,0,0,0.3)]" />
+          <span className="relative z-10 flex h-full min-h-[420px] max-w-[63%] flex-col justify-between p-8">
+            <span className="pdn-label inline-flex w-fit rounded-full bg-black px-5 py-2 text-xl text-[var(--gold-500)]">
+              Produit phare
+            </span>
+            <span>
+              <span className="pdn-display block text-[6rem] leading-[0.82] text-black">
+                Moit’-<br />Moit’
+              </span>
+              <span className="pdn-copy mt-6 block max-w-xl text-xl font-extrabold leading-tight text-black">
+                Deux recettes différentes sur une même base. Idéal pour partager sans choisir.
+              </span>
+            </span>
+            <span className="pdn-label inline-flex w-fit rounded-full border-2 border-black bg-white px-7 py-3 text-2xl text-black">
+              Créer maintenant
+            </span>
           </span>
         </button>
+
+        <div className="grid h-full grid-cols-2 gap-4">
+          {pizzaCategories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => onSelect(category)}
+              className="h-full min-h-[190px] overflow-hidden rounded-[22px] border-[3px] border-black bg-white text-left shadow-[0_6px_0_#050505] transition active:translate-y-1 active:shadow-[0_3px_0_#050505]"
+            >
+              <span className="grid h-full grid-cols-[136px_1fr]">
+                <img src={category.image} alt="" className="h-full min-h-[190px] w-full bg-[var(--paper-100)] object-cover" />
+                <span className="flex flex-col justify-center p-4">
+                  <span className="pdn-title text-[1.7rem] leading-tight">{category.name}</span>
+                  <span className="pdn-copy mt-3 text-base font-bold leading-snug text-[var(--neutral-700)]">{category.description}</span>
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={onCustomPizza}
-          className="grid grid-cols-[160px_1fr] overflow-hidden rounded-2xl border-[3px] border-[var(--night-950)] bg-white text-left shadow-[0_6px_0_var(--night-950)]"
+          className="h-full min-h-[180px] overflow-hidden rounded-[24px] border-[3px] border-black bg-white text-left shadow-[0_6px_0_#050505] transition active:translate-y-1 active:shadow-[0_3px_0_#050505]"
         >
-          <img src="/image/ingredients/mozzarella.webp" alt="" className="h-36 w-full bg-[var(--paper-100)] object-contain p-4" />
-          <span className="flex flex-col justify-center p-5">
-            <span className="pdn-title text-3xl">Pizza personnalisée</span>
-            <span className="pdn-copy mt-2 text-sm font-bold text-[var(--neutral-700)]">Choisissez votre base, format et ingrédients.</span>
+          <span className="grid h-full grid-cols-[220px_1fr_auto]">
+            <span className="grid place-items-center bg-[var(--paper-100)]">
+              <img src="/image/ingredients/mozzarella.webp" alt="" className="h-36 w-36 object-contain" />
+            </span>
+            <span className="flex flex-col justify-center p-6">
+              <span className="pdn-label text-lg text-[var(--red-500)]">Recette sur mesure</span>
+              <span className="pdn-title mt-1 text-[2.55rem] leading-none">Pizza personnalisée</span>
+              <span className="pdn-copy mt-3 text-lg font-bold leading-snug text-[var(--neutral-700)]">
+                Choisis ton format, ta base et jusqu'à 8 ingrédients.
+              </span>
+            </span>
+            <span className="flex items-center pr-6">
+              <span className="pdn-label rounded-full border-2 border-black bg-[var(--gold-500)] px-6 py-3 text-xl text-black shadow-[3px_3px_0_#050505]">
+                Composer
+              </span>
+            </span>
           </span>
         </button>
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => onSelect(category)}
-            className="grid grid-cols-[160px_1fr] overflow-hidden rounded-2xl border-2 border-[var(--night-950)] bg-white text-left shadow-[0_6px_0_var(--night-950)]"
-          >
-            <img src={category.image} alt="" className="h-36 w-full object-cover" />
-            <span className="flex flex-col justify-center p-5">
-              <span className="pdn-title text-3xl">{category.name}</span>
-              <span className="pdn-copy mt-2 text-sm font-bold text-[var(--neutral-700)]">{category.description}</span>
-            </span>
-          </button>
-        ))}
+
+        <div className="grid h-full grid-cols-2 gap-4">
+          {sideCategories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => onSelect(category)}
+              className="h-full min-h-[170px] overflow-hidden rounded-[20px] border-[3px] border-black bg-white text-left shadow-[0_5px_0_#050505] transition active:translate-y-1 active:shadow-[0_2px_0_#050505]"
+            >
+              <span className="grid h-full grid-cols-[132px_1fr]">
+                <img src={category.image} alt="" className="h-full min-h-[170px] w-full bg-[var(--paper-100)] object-cover" />
+                <span className="flex flex-col justify-center p-5">
+                  <span className="pdn-title text-[1.7rem] leading-tight">{category.name}</span>
+                  <span className="pdn-copy mt-2 text-sm font-bold leading-snug text-[var(--neutral-700)]">{category.description}</span>
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
