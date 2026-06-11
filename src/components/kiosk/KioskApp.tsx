@@ -314,139 +314,144 @@ function Maintenance() {
 }
 
 function HomeScreen({ onStart }: { onStart: () => void }) {
-  const stars = useMemo(() => {
-    const generated = [];
-    const colors = [
-      "rgba(255, 255, 255, 0.85)", // White
-      "rgba(255, 255, 255, 0.55)", // Soft White
-      "rgba(244, 196, 0, 0.85)",   // Brand Gold/Amber
-      "rgba(147, 197, 253, 0.75)"   // Ice Blue
-    ];
-    // Seeded random helper to ensure consistency on re-renders/mounts
-    let seed = 12345;
-    function random() {
-      const x = Math.sin(seed++) * 10000;
-      return x - Math.floor(x);
-    }
-    for (let i = 0; i < 140; i++) {
-      const sizeVal = random();
-      const isNear = sizeVal > 0.86;
-      const isMid = sizeVal <= 0.86 && sizeVal > 0.35;
-      const size = isNear 
-        ? (2 + random() * 1.5) 
-        : (isMid ? (1.1 + random() * 0.7) : (0.5 + random() * 0.5));
-      const depth = isNear ? "near" : (isMid ? "mid" : "far");
-      const colorVal = random();
-      const color = colorVal > 0.85 
-        ? colors[2] // gold
-        : (colorVal > 0.72 ? colors[3] : (colorVal > 0.38 ? colors[1] : colors[0]));
-      generated.push({
-        top: `${random() * 95}%`,
-        left: `${random() * 100}%`,
-        size: `${size}px`,
-        duration: `${3.5 + random() * 7}s`,
-        delay: `${random() * 8}s`,
-        depth,
-        color
+  const [shootingStar, setShootingStar] = useState<{ id: number; top: string; left: string; angle: number } | null>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShootingStar({
+        id: Date.now(),
+        top: `${Math.random() * 30}%`,
+        left: `${20 + Math.random() * 60}%`,
+        angle: 45 + Math.random() * 90,
       });
-    }
-    return generated;
+      setTimeout(() => setShootingStar(null), 1500);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
+
+  const stars = [
+    // Original stars
+    { top: "4%", left: "12%", size: "2.5px", duration: "3.2s", delay: "0.1s" },
+    { top: "9%", left: "33%", size: "1.5px", duration: "4.5s", delay: "1.2s", bright: true },
+    { top: "6%", left: "62%", size: "3px", duration: "2.8s", delay: "0.5s" },
+    { top: "11%", left: "84%", size: "2px", duration: "3.7s", delay: "2.3s" },
+    { top: "18%", left: "18%", size: "1.5px", duration: "5.0s", delay: "0.8s" },
+    { top: "25%", left: "48%", size: "2.5px", duration: "3.4s", delay: "1.9s", bright: true },
+    { top: "16%", left: "75%", size: "2px", duration: "4.1s", delay: "0.3s" },
+    { top: "30%", left: "88%", size: "3px", duration: "2.9s", delay: "2.7s" },
+    { top: "38%", left: "14%", size: "2px", duration: "3.6s", delay: "1.5s", bright: true },
+    { top: "35%", left: "65%", size: "1.5px", duration: "4.8s", delay: "0.9s" },
+    { top: "45%", left: "85%", size: "2.5px", duration: "3.1s", delay: "2.1s" },
+    { top: "52%", left: "22%", size: "2px", duration: "4.3s", delay: "0.4s", bright: true },
+    { top: "49%", left: "50%", size: "1.5px", duration: "5.2s", delay: "1.7s" },
+    { top: "55%", left: "78%", size: "3px", duration: "2.7s", delay: "1.1s" },
+    { top: "63%", left: "10%", size: "1.5px", duration: "4.9s", delay: "2.4s", bright: true },
+    { top: "70%", left: "40%", size: "2.5px", duration: "3.3s", delay: "0.7s" },
+    { top: "66%", left: "70%", size: "2px", duration: "4.0s", delay: "1.6s" },
+    { top: "78%", left: "90%", size: "3px", duration: "2.6s", delay: "3.0s", bright: true },
+    { top: "85%", left: "25%", size: "2px", duration: "3.9s", delay: "1.3s" },
+    { top: "88%", left: "55%", size: "1.5px", duration: "4.7s", delay: "0.2s" },
+    { top: "82%", left: "80%", size: "2.5px", duration: "3.5s", delay: "2.5s", bright: true },
+    // New stars
+    { top: "12%", left: "45%", size: "2px", duration: "3.5s", delay: "0.2s" },
+    { top: "28%", left: "70%", size: "1px", duration: "4.2s", delay: "1.1s" },
+    { top: "41%", left: "32%", size: "3px", duration: "2.5s", delay: "2.2s", bright: true },
+    { top: "58%", left: "62%", size: "2px", duration: "3.8s", delay: "0.6s" },
+    { top: "74%", left: "18%", size: "1.5px", duration: "5.1s", delay: "1.4s" },
+    { top: "91%", left: "42%", size: "2.5px", duration: "3.1s", delay: "2.8s" },
+    { top: "8%", left: "8%", size: "1.5px", duration: "4.6s", delay: "0.9s" },
+    { top: "22%", left: "95%", size: "2px", duration: "3.9s", delay: "1.7s" },
+    { top: "51%", left: "92%", size: "3px", duration: "2.9s", delay: "0.4s", bright: true },
+    { top: "68%", left: "5%", size: "2px", duration: "4.4s", delay: "2.1s" },
+    { top: "86%", left: "68%", size: "1.5px", duration: "5.0s", delay: "1.3s" },
+    { top: "95%", left: "28%", size: "2.5px", duration: "3.4s", delay: "0.7s" },
+    { top: "33%", left: "25%", size: "2px", duration: "4.1s", delay: "2.6s" },
+    { top: "15%", left: "55%", size: "3px", duration: "2.6s", delay: "1.8s", bright: true },
+    { top: "76%", left: "52%", size: "1.5px", duration: "4.8s", delay: "0.5s" }
+  ];
 
   return (
     <div
       onClick={(e) => handleInteractiveClick(e, onStart)}
-      className="pdn-pressable h-full min-h-full bg-[#030305] text-white relative overflow-hidden select-none cursor-pointer"
+      className="pdn-pressable h-full min-h-full bg-[#050507] text-white relative overflow-hidden select-none cursor-pointer"
     >
       {/* Embedded High-End CSS styles for keyframes & transitions */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes sky-twinkle-far {
-          0%, 100% { opacity: 0.08; transform: scale(0.8); }
-          50% { opacity: 0.55; transform: scale(1.1); }
+        @keyframes sky-twinkle {
+          0%, 100% { opacity: 0.15; transform: scale(0.75); }
+          50% { opacity: 1; transform: scale(1.25); }
         }
-        @keyframes sky-twinkle-mid {
-          0%, 100% { opacity: 0.2; transform: scale(0.75); }
-          50% { opacity: 0.8; transform: scale(1.25); }
+        @keyframes sky-twinkle-bright {
+          0%, 100% { opacity: 0.3; transform: scale(0.8); box-shadow: 0 0 2px rgba(255, 255, 255, 0.2); }
+          50% { opacity: 1; transform: scale(1.4); box-shadow: 0 0 10px rgba(255, 255, 255, 0.9); }
         }
-        @keyframes sky-twinkle-near {
-          0%, 100% { opacity: 0.35; transform: scale(0.7) rotate(0deg); box-shadow: 0 0 2px var(--star-color, #fff); }
-          50% { opacity: 1; transform: scale(1.35) rotate(45deg); box-shadow: 0 0 14px var(--star-color, #fff), 0 0 4px var(--star-color, #fff); }
-        }
-        @keyframes sky-drift {
-          0%, 100% { transform: rotate(0deg) scale(1); }
-          50% { transform: rotate(2deg) scale(1.08); }
-        }
-        @keyframes shooting-star-path {
+        @keyframes shooting-star-anim {
           0% { transform: translateY(0) scale(0); opacity: 0; }
-          4% { opacity: 1; }
-          12% { opacity: 1; }
-          22% { transform: translateY(480px) scale(0); opacity: 0; }
-          100% { transform: translateY(480px) scale(0); opacity: 0; }
+          10% { transform: translateY(50px) scale(1); opacity: 1; }
+          100% { transform: translateY(800px) scale(0); opacity: 0; }
         }
-        @keyframes nebula-pulse-1 {
-          0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.7; }
-          50% { transform: scale(1.12) translate(3%, 4%); opacity: 0.95; }
-        }
-        @keyframes nebula-pulse-2 {
-          0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.8; }
-          50% { transform: scale(1.15) translate(-4%, -3%); opacity: 0.6; }
-        }
-        @keyframes nebula-pulse-3 {
-          0%, 100% { transform: scale(1) opacity: 0.5; }
-          50% { transform: scale(1.08) opacity: 0.85; }
-        }
-        @keyframes brand-float {
-          0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 15px 30px rgba(0,0,0,0.85)); }
-          50% { transform: translateY(-12px) scale(1.015); filter: drop-shadow(0 25px 40px rgba(0,0,0,0.7)); }
-        }
-        @keyframes cta-pulse-glow {
+        @keyframes neon-pulse-border {
           0%, 100% {
-            box-shadow: 0 0 20px rgba(244, 196, 0, 0.25), inset 0 0 8px rgba(244, 196, 0, 0.15);
-            border-color: rgba(244, 196, 0, 0.7);
+            box-shadow: 0 0 18px rgba(255, 196, 0, 0.45), inset 0 0 10px rgba(255, 196, 0, 0.25), 0 0 2px rgba(230, 57, 46, 0.4);
+            border-color: #ffc400;
+          }
+          50% {
+            box-shadow: 0 0 35px rgba(255, 196, 0, 0.75), inset 0 0 20px rgba(255, 196, 0, 0.45), 0 0 6px rgba(230, 57, 46, 0.6);
+            border-color: #ffd24a;
+          }
+          45%, 47% { opacity: 0.94; }
+          46% { opacity: 1; }
+        }
+        @keyframes text-glow {
+          0%, 100% {
+            text-shadow: 0 0 4px #fff, 0 0 10px rgba(255, 196, 0, 0.8), 0 0 20px rgba(255, 196, 0, 0.5), 0 0 35px rgba(255, 108, 0, 0.3);
+          }
+          50% {
+            text-shadow: 0 0 6px #fff, 0 0 16px rgba(255, 196, 0, 0.95), 0 0 30px rgba(255, 196, 0, 0.7), 0 0 45px rgba(255, 108, 0, 0.5);
+          }
+        }
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 0 15px rgba(255, 196, 0, 0.3), inset 0 0 5px rgba(255, 196, 0, 0.1);
+            border-color: rgba(255, 196, 0, 0.7);
             transform: scale(1);
           }
           50% {
-            box-shadow: 0 0 38px rgba(244, 196, 0, 0.75), inset 0 0 18px rgba(244, 196, 0, 0.35);
-            border-color: rgba(244, 196, 0, 1);
-            transform: scale(1.035);
+            box-shadow: 0 0 30px rgba(255, 196, 0, 0.65), inset 0 0 15px rgba(255, 196, 0, 0.3);
+            border-color: rgba(255, 196, 0, 1);
+            transform: scale(1.025);
           }
         }
         @keyframes skyline-breath {
           0%, 100% {
-            filter: drop-shadow(0 0 4px rgba(255, 196, 0, 0.45));
+            filter: drop-shadow(0 0 4px rgba(255, 196, 0, 0.5));
             stroke: #ffc400;
           }
           50% {
-            filter: drop-shadow(0 0 8px rgba(255, 196, 0, 0.75));
+            filter: drop-shadow(0 0 8px rgba(255, 196, 0, 0.8));
             stroke: #ffd24a;
           }
         }
-        .star-far {
-          animation: sky-twinkle-far ease-in-out infinite alternate;
+        .star {
+          animation: sky-twinkle ease-in-out infinite alternate;
         }
-        .star-mid {
-          animation: sky-twinkle-mid ease-in-out infinite alternate;
-        }
-        .star-near {
-          animation: sky-twinkle-near ease-in-out infinite alternate;
+        .star-bright {
+          animation: sky-twinkle-bright ease-in-out infinite alternate;
         }
         .shooting-star-streak {
-          animation: shooting-star-path 12s cubic-bezier(0.25, 1, 0.25, 1) infinite;
+          animation: shooting-star-anim 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-        .animate-nebula-slow-1 {
-          animation: nebula-pulse-1 28s ease-in-out infinite alternate;
+        .animate-neon-pulse {
+          animation: neon-pulse-border 2.5s infinite alternate;
         }
-        .animate-nebula-slow-2 {
-          animation: nebula-pulse-2 36s ease-in-out infinite alternate;
+        .animate-text-glow {
+          animation: text-glow 2s infinite alternate;
         }
-        .animate-nebula-slow-3 {
-          animation: nebula-pulse-3 32s ease-in-out infinite alternate;
+        .animate-pulse-glow {
+          animation: pulse-glow 2s infinite ease-in-out;
         }
-        .animate-brand-float {
-          animation: brand-float 5s ease-in-out infinite;
-        }
-        .animate-cta-pulse-glow {
-          animation: cta-pulse-glow 2.2s infinite ease-in-out;
+        .animate-skyline-breath {
+          animation: skyline-breath 3.5s infinite ease-in-out;
         }
         .noise-overlay {
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -456,116 +461,70 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
       {/* Noise Texture Overlay */}
       <div className="absolute inset-0 noise-overlay opacity-[0.02] pointer-events-none z-[5]" />
 
-      {/* Immersive Space Nebulae */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {/* Nebula 1: Deep Violet/Indigo */}
-        <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-[radial-gradient(circle_at_30%_35%,rgba(99,102,241,0.18)_0%,rgba(15,23,42,0)_55%)] animate-nebula-slow-1" />
-        {/* Nebula 2: Warm Amber/Orange (Pizza de Nuit Brand Glow) */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_55%,rgba(217,119,6,0.15)_0%,rgba(3,3,5,0)_50%)] animate-nebula-slow-2" />
-        {/* Nebula 3: Crimson Accent */}
-        <div className="absolute top-[25%] left-[-15%] w-[130%] h-[80%] bg-[radial-gradient(circle_at_15%_75%,rgba(225,29,72,0.10)_0%,rgba(3,3,5,0)_45%)] animate-nebula-slow-3" />
-      </div>
-
-      {/* Sky Starfield Container (slow rotation drift) */}
+      {/* Sky Constellation (twinkling stars & shooting star) */}
       <div
-        className="absolute top-[-5%] left-[-5%] w-[110%] h-[60%] overflow-hidden pointer-events-none z-0"
-        style={{
-          WebkitMaskImage: "linear-gradient(to bottom, black 65%, transparent 100%)",
-          maskImage: "linear-gradient(to bottom, black 65%, transparent 100%)",
-          animation: "sky-drift 75s ease-in-out infinite"
-        }}
+        className="absolute top-0 left-0 w-full h-[55%] overflow-hidden pointer-events-none z-0"
+        style={{ WebkitMaskImage: "linear-gradient(to bottom, black 60%, transparent 100%)", maskImage: "linear-gradient(to bottom, black 60%, transparent 100%)" }}
       >
         {stars.map((star, idx) => (
           <div
             key={idx}
-            className={`absolute rounded-full ${
-              star.depth === "far" ? "star-far" : star.depth === "mid" ? "star-mid" : "star-near"
-            }`}
+            className={`absolute rounded-full bg-white ${star.bright ? 'star-bright' : 'star'}`}
             style={{
               top: star.top,
               left: star.left,
               width: star.size,
               height: star.size,
-              backgroundColor: star.color,
               animationDuration: star.duration,
-              animationDelay: star.delay,
-              // @ts-ignore
-              "--star-color": star.color
+              animationDelay: star.delay
             }}
           />
         ))}
 
-        {/* Shooting Star 1 */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: "8%",
-            left: "45%",
-            transform: "rotate(110deg)",
-            animation: "shooting-star-path 11s cubic-bezier(0.25, 1, 0.25, 1) infinite",
-            animationDelay: "1.5s"
-          }}
-        >
-          <div className="w-[1.5px] h-[90px] bg-gradient-to-b from-white to-transparent rounded-full" />
-        </div>
-
-        {/* Shooting Star 2 */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: "18%",
-            left: "70%",
-            transform: "rotate(130deg)",
-            animation: "shooting-star-path 15s cubic-bezier(0.25, 1, 0.25, 1) infinite",
-            animationDelay: "5.5s"
-          }}
-        >
-          <div className="w-[1.5px] h-[110px] bg-gradient-to-b from-white to-transparent rounded-full" />
-        </div>
-
-        {/* Shooting Star 3 */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: "22%",
-            left: "25%",
-            transform: "rotate(100deg)",
-            animation: "shooting-star-path 19s cubic-bezier(0.25, 1, 0.25, 1) infinite",
-            animationDelay: "9.5s"
-          }}
-        >
-          <div className="w-[2px] h-[80px] bg-gradient-to-b from-white to-transparent rounded-full" />
-        </div>
+        {/* Shooting Star */}
+        {shootingStar && (
+          <div
+            key={shootingStar.id}
+            className="absolute z-0 pointer-events-none"
+            style={{
+              top: shootingStar.top,
+              left: shootingStar.left,
+              transform: `rotate(${shootingStar.angle}deg)`,
+            }}
+          >
+            <div className="w-[2px] h-[100px] bg-gradient-to-b from-white to-transparent shooting-star-streak rounded-full" />
+          </div>
+        )}
       </div>
 
       {/* Ambient Radial Lights (Flares & Glows) */}
       {/* 1. Red Top-Left Reflex Aura */}
-      <div className="absolute top-[-50px] left-[-50px] h-[350px] w-[350px] rounded-full bg-red-600/[0.05] blur-[120px] pointer-events-none z-0" />
+      <div className="absolute top-[-50px] left-[-50px] h-[300px] w-[300px] rounded-full bg-red-600/[0.04] blur-[100px] pointer-events-none z-0" />
       {/* 2. Main central amber aura backing the logo */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-amber-500/[0.07] blur-[130px] pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[550px] w-[550px] rounded-full bg-amber-500/[0.06] blur-[120px] pointer-events-none z-0" />
 
       <div className="relative flex h-full min-h-full flex-col justify-between z-10 px-8 py-16">
         <div className="h-6" />
 
         {/* Central Brand Showcase */}
-        <div className="relative flex flex-col items-center justify-center animate-brand-float">
+        <div className="relative flex flex-col items-center justify-center">
           <img
             src="/image/logo upscale.png"
             alt="Pizza de Nuit Logo"
             style={{
               width: "480px",
               height: "480px",
-              filter: "drop-shadow(2px -6px 6px rgba(255, 200, 0, 0.65)) drop-shadow(-8px 4px 8px rgba(255, 160, 0, 0.55)) drop-shadow(6px 10px 5px rgba(255, 220, 0, 0.45)) drop-shadow(0px 0px 22px rgba(255, 150, 0, 0.35))"
+              filter: "drop-shadow(2px -6px 4px rgba(255, 200, 0, 0.6)) drop-shadow(-7px 4px 5px rgba(255, 170, 0, 0.5)) drop-shadow(5px 8px 3px rgba(255, 220, 0, 0.4)) drop-shadow(0px 0px 15px rgba(255, 150, 0, 0.3)) drop-shadow(0 15px 25px rgba(0,0,0,0.8))"
             }}
-            className="object-contain z-10"
+            className="object-contain z-10 animate-[float_4s_ease-in-out_infinite]"
           />
 
           <div className="mt-8 text-center w-full px-4 translate-y-8">
-            <h1 className="pdn-display text-[5rem] text-[#f4c400] filter drop-shadow-[0_0_10px_rgba(244,196,0,0.45)] leading-tight">
+            <h1 className="pdn-display text-[5rem] text-[#f4c400] filter drop-shadow-[0_0_8px_rgba(244,196,0,0.4)] leading-tight">
               LA STREET PIZZA <br/>
-              <span className="text-white text-[4.5rem] filter drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]">DE LA NUIT</span>
+              <span className="text-white text-[4.5rem] filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">DE LA NUIT</span>
             </h1>
-            <p className="pdn-label mt-6 text-xl text-white/75 leading-relaxed max-w-sm mx-auto">
+            <p className="pdn-label mt-6 text-xl text-white/70 leading-relaxed max-w-sm mx-auto">
               Formats XXL • Option Moit/Moit <br/>
               <span className="text-[#f4c400]">Ouvert 7J/7 jusqu'à 4h</span>
             </p>
@@ -573,161 +532,103 @@ function HomeScreen({ onStart }: { onStart: () => void }) {
         </div>
 
         {/* Deep Amber Horizon Aura */}
-        <div
-          className="absolute bottom-0 left-0 w-full h-[420px] pointer-events-none z-10 opacity-80"
-          style={{
-            background: "linear-gradient(to top, rgba(180, 90, 0, 0.65) 0%, rgba(100, 35, 0, 0.42) 35%, rgba(30, 10, 0, 0.18) 65%, transparent 100%)"
-          }}
-        />
+      <div
+        className="absolute bottom-0 left-0 w-full h-[400px] pointer-events-none z-10 opacity-80"
+        style={{
+          background: "linear-gradient(to top, rgba(180, 100, 0, 0.6) 0%, rgba(100, 40, 0, 0.4) 30%, rgba(30, 10, 0, 0.15) 60%, transparent 100%)"
+        }}
+      />
 
-        {/* Distant City Skyline Silhouette (Parallax Depth Layer) */}
-        <div className="absolute bottom-0 left-[-5%] w-[110%] h-[305px] pointer-events-none z-15 opacity-[0.25] transform translate-y-4">
-          <svg viewBox="0 0 1000 250" preserveAspectRatio="none" className="w-full h-full fill-[#0f0e1a]">
-            {/* Base solid ground */}
-            <rect x="0" y="240" width="1000" height="10" />
+      {/* City Skyline Silhouette */}
+      <div className="absolute bottom-0 left-0 w-full h-[280px] pointer-events-none z-20">
+        <svg viewBox="0 0 1000 250" preserveAspectRatio="none" className="w-full h-full fill-black">
+          {/* Base solid ground */}
+          <rect x="0" y="240" width="1000" height="10" />
 
-            {/* Shifted Buildings for offset silhouette */}
-            <rect x="0" y="210" width="15" height="40" />
-            <rect x="15" y="195" width="25" height="55" />
-            <rect x="35" y="180" width="15" height="70" />
-            <rect x="65" y="215" width="25" height="35" />
+          {/* Buildings */}
+          <rect x="0" y="210" width="15" height="40" />
+          <rect x="15" y="195" width="25" height="55" />
+          <rect x="35" y="180" width="15" height="70" />
+          <rect x="65" y="215" width="25" height="35" />
 
-            {/* Spire building */}
-            <rect x="80" y="180" width="55" height="70" />
-            <rect x="90" y="150" width="35" height="100" />
-            <rect x="95" y="120" width="25" height="130" />
-            <rect x="102" y="90" width="11" height="160" />
-            <rect x="106" y="60" width="3" height="190" />
+          {/* Spire building */}
+          <rect x="100" y="180" width="55" height="70" />
+          <rect x="110" y="150" width="35" height="100" />
+          <rect x="115" y="120" width="25" height="130" />
+          <rect x="122" y="90" width="11" height="160" />
+          <rect x="126" y="60" width="3" height="190" />
 
-            {/* Blocks */}
-            <rect x="145" y="200" width="35" height="50" />
-            <rect x="180" y="190" width="20" height="60" />
-            <rect x="210" y="170" width="65" height="80" />
-            <rect x="290" y="215" width="25" height="35" />
+          {/* Blocks */}
+          <rect x="165" y="200" width="35" height="50" />
+          <rect x="200" y="190" width="20" height="60" />
+          <rect x="230" y="170" width="65" height="80" />
+          <rect x="310" y="215" width="25" height="35" />
 
-            {/* Triangular building */}
-            <rect x="330" y="160" width="55" height="90" />
-            <polygon points="330,160 357,90 385,160" />
-            <rect x="345" y="130" width="25" height="120" />
+          {/* Triangular building */}
+          <rect x="350" y="160" width="55" height="90" />
+          <polygon points="350,160 377,90 405,160" />
+          <rect x="365" y="130" width="25" height="120" />
 
-            {/* Mid blocks */}
-            <rect x="400" y="195" width="35" height="55" />
-            <rect x="415" y="185" width="15" height="65" />
-            <rect x="450" y="210" width="25" height="40" />
+          {/* Mid blocks */}
+          <rect x="420" y="195" width="35" height="55" />
+          <rect x="435" y="185" width="15" height="65" />
+          <rect x="470" y="210" width="25" height="40" />
 
-            {/* Slanted roof building */}
-            <rect x="490" y="140" width="75" height="110" />
-            <polygon points="490,140 565,60 565,140" />
+          {/* Slanted roof building */}
+          <rect x="510" y="140" width="75" height="110" />
+          <polygon points="510,140 585,60 585,140" />
 
-            {/* Mid-right blocks */}
-            <rect x="580" y="190" width="25" height="60" />
-            <rect x="590" y="180" width="10" height="70" />
-            <rect x="620" y="205" width="35" height="45" />
+          {/* Mid-right blocks */}
+          <rect x="600" y="190" width="25" height="60" />
+          <rect x="610" y="180" width="10" height="70" />
+          <rect x="640" y="205" width="35" height="45" />
 
-            {/* Tall blocky building */}
-            <rect x="670" y="130" width="65" height="120" />
-            <rect x="685" y="90" width="35" height="160" />
-            <rect x="695" y="50" width="15" height="200" />
+          {/* Tall blocky building */}
+          <rect x="690" y="130" width="65" height="120" />
+          <rect x="705" y="90" width="35" height="160" />
+          <rect x="715" y="50" width="15" height="200" />
 
-            {/* Right side */}
-            <rect x="750" y="185" width="45" height="65" />
-            <rect x="810" y="215" width="25" height="35" />
-            <rect x="850" y="180" width="60" height="70" />
-            <rect x="925" y="200" width="40" height="50" />
-            <rect x="970" y="220" width="20" height="30" />
-          </svg>
-        </div>
+          {/* Right side */}
+          <rect x="770" y="185" width="45" height="65" />
+          <rect x="830" y="215" width="25" height="35" />
+          <rect x="870" y="180" width="60" height="70" />
+          <rect x="945" y="200" width="40" height="50" />
+          <rect x="990" y="220" width="20" height="30" />
 
-        {/* Foreground City Skyline Silhouette */}
-        <div className="absolute bottom-0 left-0 w-full h-[280px] pointer-events-none z-20">
-          <svg viewBox="0 0 1000 250" preserveAspectRatio="none" className="w-full h-full fill-black">
-            {/* Base solid ground */}
-            <rect x="0" y="240" width="1000" height="10" />
+          {/* Tiny windows (amber glow) */}
+          <g className="fill-[#ffcc00] opacity-80 animate-pulse">
+            <rect x="40" y="195" width="3" height="3" />
+            <rect x="120" y="140" width="4" height="4" />
+            <rect x="130" y="160" width="4" height="4" />
+            <rect x="125" y="190" width="4" height="4" />
+            <rect x="250" y="180" width="4" height="4" />
+            <rect x="270" y="200" width="4" height="4" />
+            <rect x="260" y="220" width="4" height="4" />
+            <rect x="365" y="175" width="4" height="4" />
+            <rect x="380" y="195" width="4" height="4" />
+            <rect x="375" y="220" width="4" height="4" />
+            <rect x="430" y="210" width="3" height="3" />
+            <rect x="530" y="160" width="4" height="4" />
+            <rect x="560" y="185" width="4" height="4" />
+            <rect x="545" y="210" width="4" height="4" />
+            <rect x="610" y="205" width="3" height="3" />
+            <rect x="715" y="110" width="4" height="4" />
+            <rect x="730" y="140" width="4" height="4" />
+            <rect x="720" y="180" width="4" height="4" />
+            <rect x="790" y="200" width="4" height="4" />
+            <rect x="800" y="215" width="3" height="3" />
+            <rect x="885" y="195" width="4" height="4" />
+            <rect x="905" y="215" width="4" height="4" />
+            <rect x="965" y="220" width="3" height="3" />
+          </g>
+        </svg>
+      </div>
 
-            {/* Buildings */}
-            <rect x="0" y="210" width="15" height="40" />
-            <rect x="15" y="195" width="25" height="55" />
-            <rect x="35" y="180" width="15" height="70" />
-            <rect x="65" y="215" width="25" height="35" />
-
-            {/* Spire building */}
-            <rect x="100" y="180" width="55" height="70" />
-            <rect x="110" y="150" width="35" height="100" />
-            <rect x="115" y="120" width="25" height="130" />
-            <rect x="122" y="90" width="11" height="160" />
-            <rect x="126" y="60" width="3" height="190" />
-
-            {/* Blocks */}
-            <rect x="165" y="200" width="35" height="50" />
-            <rect x="200" y="190" width="20" height="60" />
-            <rect x="230" y="170" width="65" height="80" />
-            <rect x="310" y="215" width="25" height="35" />
-
-            {/* Triangular building */}
-            <rect x="350" y="160" width="55" height="90" />
-            <polygon points="350,160 377,90 405,160" />
-            <rect x="365" y="130" width="25" height="120" />
-
-            {/* Mid blocks */}
-            <rect x="420" y="195" width="35" height="55" />
-            <rect x="435" y="185" width="15" height="65" />
-            <rect x="470" y="210" width="25" height="40" />
-
-            {/* Slanted roof building */}
-            <rect x="510" y="140" width="75" height="110" />
-            <polygon points="510,140 585,60 585,140" />
-
-            {/* Mid-right blocks */}
-            <rect x="600" y="190" width="25" height="60" />
-            <rect x="610" y="180" width="10" height="70" />
-            <rect x="640" y="205" width="35" height="45" />
-
-            {/* Tall blocky building */}
-            <rect x="690" y="130" width="65" height="120" />
-            <rect x="705" y="90" width="35" height="160" />
-            <rect x="715" y="50" width="15" height="200" />
-
-            {/* Right side */}
-            <rect x="770" y="185" width="45" height="65" />
-            <rect x="830" y="215" width="25" height="35" />
-            <rect x="870" y="180" width="60" height="70" />
-            <rect x="945" y="200" width="40" height="50" />
-            <rect x="990" y="220" width="20" height="30" />
-
-            {/* Tiny windows (amber glow) */}
-            <g className="fill-[#ffcc00] opacity-80 animate-pulse">
-              <rect x="40" y="195" width="3" height="3" />
-              <rect x="120" y="140" width="4" height="4" />
-              <rect x="130" y="160" width="4" height="4" />
-              <rect x="125" y="190" width="4" height="4" />
-              <rect x="250" y="180" width="4" height="4" />
-              <rect x="270" y="200" width="4" height="4" />
-              <rect x="260" y="220" width="4" height="4" />
-              <rect x="365" y="175" width="4" height="4" />
-              <rect x="380" y="195" width="4" height="4" />
-              <rect x="375" y="220" width="4" height="4" />
-              <rect x="430" y="210" width="3" height="3" />
-              <rect x="530" y="160" width="4" height="4" />
-              <rect x="560" y="185" width="4" height="4" />
-              <rect x="545" y="210" width="4" height="4" />
-              <rect x="610" y="205" width="3" height="3" />
-              <rect x="715" y="110" width="4" height="4" />
-              <rect x="730" y="140" width="4" height="4" />
-              <rect x="720" y="180" width="4" height="4" />
-              <rect x="790" y="200" width="4" height="4" />
-              <rect x="800" y="215" width="3" height="3" />
-              <rect x="885" y="195" width="4" height="4" />
-              <rect x="905" y="215" width="4" height="4" />
-              <rect x="965" y="220" width="3" height="3" />
-            </g>
-          </svg>
-        </div>
-
-        {/* Bottom Call-To-Action (Pill Button) */}
+      {/* Bottom Call-To-Action (Pill Button) */}
         <div className="relative mb-[280px] flex flex-col items-center gap-6 w-full z-30">
           <button
             type="button"
-            className="pdn-label animate-cta-pulse-glow z-40 flex min-h-[88px] w-full max-w-[360px] items-center justify-center rounded-full border-2 border-[#f4c400] bg-[#050507]/90 px-8 py-5 text-2xl text-[#f4c400] shadow-[0_0_28px_rgba(244,196,0,0.28)] backdrop-blur-sm transition duration-100 ease-out pointer-events-none"
+            className="pdn-label animate-pulse-glow z-40 flex min-h-[88px] w-full max-w-[360px] items-center justify-center rounded-full border-2 border-[#f4c400] bg-[#050507]/90 px-8 py-5 text-2xl text-[#f4c400] shadow-[0_0_28px_rgba(244,196,0,0.28)] backdrop-blur-sm transition duration-100 ease-out pointer-events-none"
           >
             Toucher pour commander
           </button>
